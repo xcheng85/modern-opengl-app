@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include/**",
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/external/src/vulkan/include",
+                "${workspaceFolder}/external/src/glslang/**",
+                "${workspaceFolder}/external/src/volk",
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c23",
+            "cppStandard": "c++23",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

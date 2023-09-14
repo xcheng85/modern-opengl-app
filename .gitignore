@@ -1,0 +1,8 @@
+*.py
+
+external
+
+**/build
+**/bin
+
+**/debug
