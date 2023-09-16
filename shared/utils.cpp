@@ -1,7 +1,15 @@
 #include <string>
+#include <format>
 #include <string.h>
 #include <fstream>
+#include <iostream>
+#include <ranges>
+// ranges::copy
+#include <algorithm>
 #include "utils.h"
+
+using namespace std;
+
 namespace SharedUtils
 {
 	int endsWith(const char *s, const char *part)
@@ -99,5 +107,19 @@ namespace SharedUtils
 		file.close();
 
 		return buffer;
+	}
+
+	namespace rv = std::ranges::views;
+	namespace rg = std::ranges;
+
+	// versioning of function
+	// inline become the default
+
+	namespace version_2
+	{
+		void convert(std::vector<string> const &in, std::vector<const char *> &out)
+		{
+			cout << format("to do");
+		}
 	}
 }

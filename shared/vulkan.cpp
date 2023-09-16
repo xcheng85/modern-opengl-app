@@ -68,11 +68,13 @@ namespace SharedUtils
 		// 				   .c_str();
 
 		std::vector<const char *> layer_names(validationLayers.getValidationLayers().size());
-		std::transform(validationLayers.getValidationLayers().begin(), validationLayers.getValidationLayers().end(), layer_names.begin(), [](const std::string &s)
-					   { return s.c_str(); });
+		// std::transform(validationLayers.getValidationLayers().begin(), validationLayers.getValidationLayers().end(), layer_names.begin(), [](const std::string &s)
+		// 			   { return s.c_str(); });
 		std::vector<const char *> extensitions_names(extensions.getExtensions().size());
-		std::transform(extensions.getExtensions().begin(), extensions.getExtensions().end(), extensitions_names.begin(), [](const std::string &s)
-					   { return s.c_str(); });
+		// std::transform(extensions.getExtensions().begin(), extensions.getExtensions().end(), extensitions_names.begin(), [](const std::string &s)
+		// 			   { return s.c_str(); });
+		convert(t, layer_names);
+		convert(e, extensitions_names);
 
 		const VkInstanceCreateInfo createInfo =
 			{
