@@ -7,6 +7,9 @@
 
 // following header include volk.sh and glslang_c_interface.h
 #include "shared/vulkan.h"
+#include "shared/platform.h"
+#include "shared/window.h"
+#include "shared/application.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -21,11 +24,25 @@ namespace di = boost::di;
 using namespace SharedUtils;
 using namespace std;
 
+class IocApplication : public Application
+{
+public:
+    IocApplication() : Application()
+    {
+        cout << "Ioc ctor" << std::endl;
+    };
+};
+
 int main()
 {
-    
+    auto injector = di::make_injector(
+        di::bind<IWindow>().to<GlfwWindow>(),
+        di::bind<IApplication>().to<IocApplication>());
 
-
+    auto platform = injector.create<std::unique_ptr<UnixPlatform>>();
+    platform.get()->main_loop();
+    return 0;
+    /*
     glslang_initialize_process();
 
     volkInitialize();
@@ -35,10 +52,10 @@ int main()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow *window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
 
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+    // uint32_t extensionCount = 0;
+    // vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+    // std::cout << extensionCount << " extensions supported\n";
 
-    std::cout << extensionCount << " extensions supported\n";
     auto injector = di::make_injector(
         di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
         di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
@@ -64,5 +81,5 @@ int main()
 
     glslang_finalize_process();
 
-    return 0;
+    return 0;*/
 }

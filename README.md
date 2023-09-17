@@ -56,3 +56,10 @@ cd debug
 cmake .. -G "Ninja"  -DCMAKE_BUILD_TYPE=Debug
 ninja
 ```
+
+## issue of undefined reference
+/home/xiao/modern-opengl-app/./shared/di.hpp:1847: undefined reference to `SharedUtils::UnixPlatform::UnixPlatform()'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+
+do cmake again
