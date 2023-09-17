@@ -27,7 +27,10 @@ using namespace std;
 class IocApplication : public Application
 {
 public:
-    IocApplication() : Application()
+    IocApplication(
+        std::unique_ptr<VulkanRenderingDebugger>
+
+        ) : Application()
     {
         cout << "Ioc ctor" << std::endl;
     };
@@ -35,12 +38,41 @@ public:
 
 int main()
 {
-    auto injector = di::make_injector(
-        di::bind<IWindow>().to<GlfwWindow>(),
-        di::bind<IApplication>().to<IocApplication>());
+    glslang_initialize_process();
+
+    volkInitialize();
+
+    auto framework_module = []
+    {
+        return di::make_injector(
+            di::bind<IWindow>().to<GlfwWindow>(),
+            di::bind<IApplication>().to<IocApplication>());
+    };
+
+    auto vulkan_module = []
+    {
+        return di::make_injector(
+            di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
+            di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
+            di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
+            di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
+    };
+
+    auto injector = di::make_injector(framework_module(), vulkan_module());
+
+    // auto injector = di::make_injector(
+    //     di::bind<IWindow>().to<GlfwWindow>(),
+    //     di::bind<IApplication>().to<IocApplication>()
+    //     // di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
+    //     // di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
+    //     // di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
+    //     // di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1")
+    // );
 
     auto platform = injector.create<std::unique_ptr<UnixPlatform>>();
     platform.get()->main_loop();
+
+    glslang_finalize_process();
     return 0;
     /*
     glslang_initialize_process();

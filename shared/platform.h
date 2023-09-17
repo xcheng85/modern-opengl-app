@@ -21,7 +21,6 @@ namespace SharedUtils
         virtual void main_loop();
 
     protected:
-        virtual void create_window() = 0;
         std::shared_ptr<IWindow> _window;
         std::shared_ptr<IApplication> _application;
     };
@@ -30,8 +29,6 @@ namespace SharedUtils
     {
     public:
         explicit UnixPlatform(std::shared_ptr<IWindow>, std::shared_ptr<IApplication>);
-
-    protected:
-        virtual void create_window() override;
+        virtual ~UnixPlatform();
     };
 };

@@ -27,13 +27,11 @@ namespace SharedUtils
 	VulkanRenderingContextValidationLayers::VulkanRenderingContextValidationLayers(std::vector<ConfigString> const &validationLayers)
 		: _validationLayers(validationLayers)
 	{
-
 	}
 
 	VulkanRenderingContextExtensions::VulkanRenderingContextExtensions(std::vector<ConfigString> const &extensions)
 		: _extensions(extensions)
 	{
-
 	}
 
 	VulkanRenderingHostAppSettings::VulkanRenderingHostAppSettings(const std::string name, const std::string version)
@@ -154,6 +152,7 @@ namespace SharedUtils
 
 	VulkanRenderingDebugger::VulkanRenderingDebugger(VulkanRenderingContext const &ctx)
 	{
+		cout << format("--> VulkanRenderingDebugger::VulkanRenderingDebugger") << std::endl;
 		{
 			const VkDebugUtilsMessengerCreateInfoEXT ci = {
 				.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -183,6 +182,7 @@ namespace SharedUtils
 				.pUserData = nullptr};
 			VK_CHECK(vkCreateDebugReportCallbackEXT(ctx.getInstance(), &ci, nullptr, &_reportCallback));
 		}
+		cout << format("<-- VulkanRenderingDebugger::VulkanRenderingDebugger") << std::endl;
 	}
 
 	glslang_stage_t glslangShaderStageFromFileName(const char *fileName)
