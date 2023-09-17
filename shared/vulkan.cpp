@@ -150,7 +150,7 @@ namespace SharedUtils
 		return VK_FALSE;
 	}
 
-	VulkanRenderingDebugger::VulkanRenderingDebugger(VulkanRenderingContext const &ctx)
+	VulkanRenderingDebugger::VulkanRenderingDebugger(IRenderingContext const& ctx)
 	{
 		cout << format("--> VulkanRenderingDebugger::VulkanRenderingDebugger") << std::endl;
 		{

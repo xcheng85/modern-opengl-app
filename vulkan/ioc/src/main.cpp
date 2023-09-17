@@ -28,7 +28,7 @@ class IocApplication : public Application
 {
 public:
     IocApplication(
-        std::unique_ptr<VulkanRenderingDebugger>
+        std::shared_ptr<VulkanRenderingDebugger>, std::shared_ptr<VulkanRenderingDebugger>
 
         ) : Application()
     {
@@ -55,6 +55,7 @@ int main()
             di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
             di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
             di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
+            di::bind<IRenderingContext>().to<VulkanRenderingContext>(),
             di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
     };
 

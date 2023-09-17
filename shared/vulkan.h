@@ -2,6 +2,7 @@
 #define VK_NO_PROTOTYPES // for volk
 #include <vector>
 #include <string>
+#include <memory>
 #include <volk.h>
 
 #include "glslang_c_interface.h"
@@ -119,7 +120,7 @@ namespace SharedUtils
     class VulkanRenderingDebugger : public IRenderingDebugger
     {
     public:
-        VulkanRenderingDebugger(VulkanRenderingContext const &ctx);
+        VulkanRenderingDebugger(IRenderingContext const& ctx);
 
     private:
         VkDebugUtilsMessengerEXT _messenger;
