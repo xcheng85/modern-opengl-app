@@ -4,9 +4,14 @@
 #include <cassert>
 #include <numeric>
 #include <vector>
+#include <iostream>
+#include <format>
 
 #include "utils.h"
 #include "vulkan.h"
+
+using namespace std;
+
 namespace SharedUtils
 {
 	void CHECK(bool check, const char *fileName, int lineNumber)
@@ -19,16 +24,16 @@ namespace SharedUtils
 		}
 	}
 
-	VulkanRenderingContextValidationLayers::VulkanRenderingContextValidationLayers(const std::vector<std::string> &validationLayers)
+	VulkanRenderingContextValidationLayers::VulkanRenderingContextValidationLayers(std::vector<ConfigString> const &validationLayers)
 		: _validationLayers(validationLayers)
 	{
-		//assert(validationLayers.size() == 1);
+
 	}
 
-	VulkanRenderingContextExtensions::VulkanRenderingContextExtensions(const std::vector<std::string> &extensions)
+	VulkanRenderingContextExtensions::VulkanRenderingContextExtensions(std::vector<ConfigString> const &extensions)
 		: _extensions(extensions)
 	{
-		//assert(extensions.size() == 4);
+
 	}
 
 	VulkanRenderingHostAppSettings::VulkanRenderingHostAppSettings(const std::string name, const std::string version)
@@ -38,6 +43,7 @@ namespace SharedUtils
 
 	VulkanRenderingContext::VulkanRenderingContext(IRenderingContextValidationLayer &validationLayers, IRenderingContextExtensions &extensions, IRenderingHostAppSettings &hostAppSettings)
 	{
+		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
 		const VkApplicationInfo appinfo =
 			{
 				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -47,34 +53,58 @@ namespace SharedUtils
 				.pEngineName = "No Engine",
 				.engineVersion = VK_MAKE_VERSION(1, 0, 0),
 				.apiVersion = VK_API_VERSION_1_3};
+		// di string vector issues.
+		// auto const &t = validationLayers.getValidationLayers();
+		// auto const &e = extensions.getExtensions();
+		// // auto allLayers = std::accumulate(
+		// // 					 std::next(validationLayers.getValidationLayers().begin()), validationLayers.getValidationLayers().end(),
+		// // 					 validationLayers.getValidationLayers()[0],
+		// // 					 [](std::string a, std::string b)
+		// // 					 {
+		// // 						 return a + b;
+		// // 					 })
+		// // 					 .c_str();
+		// // auto allExts = std::accumulate(
+		// // 				   std::next(extensions.getExtensions().begin()), extensions.getExtensions().end(),
+		// // 				   extensions.getExtensions()[0],
+		// // 				   [](std::string a, std::string b)
+		// // 				   {
+		// // 					   return a + b;
+		// // 				   })
+		// // 				   .c_str();
+		// std::vector<const char *> layer_names(validationLayers.getValidationLayers().size());
+		// // std::transform(validationLayers.getValidationLayers().begin(), validationLayers.getValidationLayers().end(), layer_names.begin(), [](const std::string &s)
+		// // 			   { return s.c_str(); });
+		// std::vector<const char *> extensitions_names(extensions.getExtensions().size());
+		// // std::transform(extensions.getExtensions().begin(), extensions.getExtensions().end(), extensitions_names.begin(), [](const std::string &s)
+		// // 			   { return s.c_str(); });
+		// convert(t, layer_names);
+		// convert(e, extensitions_names);
 
-		const std::vector<std::string> t = validationLayers.getValidationLayers();
-		const std::vector<std::string> e = extensions.getExtensions();
-		// auto allLayers = std::accumulate(
-		// 					 std::next(validationLayers.getValidationLayers().begin()), validationLayers.getValidationLayers().end(),
-		// 					 validationLayers.getValidationLayers()[0],
-		// 					 [](std::string a, std::string b)
-		// 					 {
-		// 						 return a + b;
-		// 					 })
-		// 					 .c_str();
-		// auto allExts = std::accumulate(
-		// 				   std::next(extensions.getExtensions().begin()), extensions.getExtensions().end(),
-		// 				   extensions.getExtensions()[0],
-		// 				   [](std::string a, std::string b)
-		// 				   {
-		// 					   return a + b;
-		// 				   })
-		// 				   .c_str();
+		// break the di design
+		const std::vector<const char *> hack_layers =
+			{
+				"VK_LAYER_KHRONOS_validation"};
 
-		std::vector<const char *> layer_names(validationLayers.getValidationLayers().size());
-		// std::transform(validationLayers.getValidationLayers().begin(), validationLayers.getValidationLayers().end(), layer_names.begin(), [](const std::string &s)
-		// 			   { return s.c_str(); });
-		std::vector<const char *> extensitions_names(extensions.getExtensions().size());
-		// std::transform(extensions.getExtensions().begin(), extensions.getExtensions().end(), extensitions_names.begin(), [](const std::string &s)
-		// 			   { return s.c_str(); });
-		convert(t, layer_names);
-		convert(e, extensitions_names);
+		const std::vector<const char *> hack_extensions =
+		{
+			"VK_KHR_surface",
+#if defined(_WIN32)
+			"VK_KHR_win32_surface"
+#endif
+#if defined(__APPLE__)
+			"VK_MVK_macos_surface"
+#endif
+#if defined(__linux__)
+			"VK_KHR_xcb_surface"
+#endif
+			,
+			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+			VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+			/* for indexed textures */
+			,
+			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+		};
 
 		const VkInstanceCreateInfo createInfo =
 			{
@@ -82,14 +112,77 @@ namespace SharedUtils
 				.pNext = nullptr,
 				.flags = 0,
 				.pApplicationInfo = &appinfo,
-				.enabledLayerCount = static_cast<uint32_t>(validationLayers.getValidationLayers().size()),
-				.ppEnabledLayerNames = layer_names.data(),
-				.enabledExtensionCount = static_cast<uint32_t>(extensions.getExtensions().size()),
-				.ppEnabledExtensionNames = extensitions_names.data()};
+				.enabledLayerCount = static_cast<uint32_t>(hack_layers.size()),
+				.ppEnabledLayerNames = hack_layers.data(),
+				.enabledExtensionCount = static_cast<uint32_t>(hack_extensions.size()),
+				.ppEnabledExtensionNames = hack_extensions.data()};
 
 		VK_CHECK(vkCreateInstance(&createInfo, nullptr, &_instance));
 		// This function will load all required Vulkan entrypoints, including all extensions; you can use Vulkan from here on as usual.
 		volkLoadInstance(_instance);
+
+		cout << format("<-- VulkanRenderingContext::VulkanRenderingContext") << std::endl;
+	}
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT Severity,
+		VkDebugUtilsMessageTypeFlagsEXT Type,
+		const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+		void *UserData)
+	{
+		std::cerr << format("validation layer: {}", pCallbackData->pMessage) << std::endl;
+		return VK_FALSE;
+	}
+	// on vulkan object
+	// objectType
+	// object handle
+	static VKAPI_ATTR VkBool32 VKAPI_CALL VulkanDebugReportCallback(
+		VkDebugReportFlagsEXT flags,
+		VkDebugReportObjectTypeEXT objectType,
+		uint64_t object,
+		size_t location,
+		int32_t messageCode,
+		const char *pLayerPrefix,
+		const char *pMessage,
+		void *UserData)
+	{
+		if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)
+			return VK_FALSE;
+		std::cerr << format("Debug callback: {}, {}", pLayerPrefix, pMessage) << std::endl;
+		return VK_FALSE;
+	}
+
+	VulkanRenderingDebugger::VulkanRenderingDebugger(VulkanRenderingContext const &ctx)
+	{
+		{
+			const VkDebugUtilsMessengerCreateInfoEXT ci = {
+				.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+				.messageSeverity =
+					VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+					VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+				.messageType =
+					VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+					VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+					VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+				.pfnUserCallback = &VulkanDebugCallback,
+				.pUserData = nullptr};
+			VK_CHECK(vkCreateDebugUtilsMessengerEXT(ctx.getInstance(), &ci, nullptr, &_messenger));
+		}
+		// enable the following will crash
+		{
+
+			const VkDebugReportCallbackCreateInfoEXT ci = {
+				.sType = VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT,
+				.pNext = nullptr,
+				.flags =
+					VK_DEBUG_REPORT_WARNING_BIT_EXT |
+					VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT |
+					VK_DEBUG_REPORT_ERROR_BIT_EXT |
+					VK_DEBUG_REPORT_DEBUG_BIT_EXT,
+				.pfnCallback = &VulkanDebugReportCallback,
+				.pUserData = nullptr};
+			VK_CHECK(vkCreateDebugReportCallbackEXT(ctx.getInstance(), &ci, nullptr, &_reportCallback));
+		}
 	}
 
 	glslang_stage_t glslangShaderStageFromFileName(const char *fileName)

@@ -19,9 +19,13 @@
 namespace di = boost::di;
 
 using namespace SharedUtils;
+using namespace std;
 
 int main()
 {
+    
+
+
     glslang_initialize_process();
 
     volkInitialize();
@@ -35,34 +39,19 @@ int main()
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 
     std::cout << extensionCount << " extensions supported\n";
-    std::vector<std::string> v{"VK_LAYER_KHRONOS_validation"};
-    std::vector<std::string> e
-    {
-        "VK_KHR_surface",
-#if defined(_WIN32)
-            "VK_KHR_win32_surface"
-#endif
-#if defined(__APPLE__)
-            "VK_MVK_macos_surface"
-#endif
-#if defined(__linux__)
-            "VK_KHR_xcb_surface"
-#endif
-            ,
-            VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-            VK_EXT_DEBUG_REPORT_EXTENSION_NAME
-    };
     auto injector = di::make_injector(
         di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
         di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
         di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
 
-        di::bind<std::string[]>().named(VALIDATION_LAYERS).to(v),
-        di::bind<std::string[]>().named(VULKAN_EXTENSIONS).to(e),
-        di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"),
-        di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
+        // di::bind<ConfigString[]>().named(VALIDATION_LAYERS).to({ConfigString{"VK_LAYER_KHRONOS_validation"}}),
+        // di::bind<ConfigString[]>().named(VULKAN_EXTENSIONS).to({ConfigString{"VK_KHR_surface"}, ConfigString{
+        //                                                                                             "VK_KHR_surface"
+        //                                                                                         },
+        //                                                         ConfigString{"VK_KHR_surface"}, ConfigString{"VK_KHR_surface"}}),
+        di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
 
-    injector.create<VulkanRenderingContext>();
+    injector.create<VulkanRenderingDebugger>();
 
     while (!glfwWindowShouldClose(window))
     {

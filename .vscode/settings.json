@@ -90,6 +90,8 @@
         "__memory": "cpp",
         "filesystem": "cpp",
         "locale": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "__config": "cpp",
+        "format": "cpp"
     }
 }

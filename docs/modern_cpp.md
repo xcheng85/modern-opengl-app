@@ -114,10 +114,34 @@ no implicit conversion
 ## namespace and name collision, versioning and backward compatibly with inline namespaces
 unnamed namespace vs static 
 
-
-
-
 ## formatting text
 std::format
 #include <format>
 need gcc 13+
+
+## return value structural binding
+
+tuple,map,etc.
+
+
+```c++
+auto [v1, v2, v3] = function();
+```
+
+```golang
+fid, err := svc.getOffset(data.ID, 34)
+```
+
+```typescript
+const {} = object
+
+```
+
+## template argument deduction. 
+compiler deduction maybe not what you expect.
+1. sepcify type on the lvalue = side
+2. explictly create deduction rules in the same namespace to affect compiler
+
+
+## conversion between string and numerical types
+
