@@ -25,11 +25,13 @@ namespace SharedUtils
 
     void Application::resize(const uint32_t width, const uint32_t height)
     {
-        
+        cout << format("--> Application::resize") << std::endl;
+        cout << format("<-- Application::resize") << std::endl;
     }
 
     void Application::terminate()
     {
+        cout << format("--> Application::terminate") << std::endl;
+        cout << format("<-- Application::terminate") << std::endl;
     }
-
 }

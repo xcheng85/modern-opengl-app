@@ -18,7 +18,12 @@ namespace SharedUtils
     {
     public:
         virtual ~IPlatform() = default;
-        virtual void main_loop();
+        // following two is the framework
+        void main_loop();
+        void update();
+        void terminate();
+        virtual void close();
+        virtual void resize(uint32_t width, uint32_t height);
 
     protected:
         std::shared_ptr<IWindow> _window;

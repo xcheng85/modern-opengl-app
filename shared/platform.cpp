@@ -10,6 +10,10 @@ namespace SharedUtils
     {
         while (!_window->ShouldClose())
         {
+            update();
+            
+            _window->ProcessEvents();
+
             // try
             // {
             //     // Load the requested app
@@ -56,17 +60,39 @@ namespace SharedUtils
         }
     }
 
+    void IPlatform::update()
+    {
+        _application->update();
+    }
+
+    void IPlatform::terminate()
+    {
+        _application->terminate();
+    }
+
+    void IPlatform::close()
+    {
+        _window->Close();
+    }
+
+    void IPlatform::resize(uint32_t width, uint32_t height)
+    {
+        cout << format("--> IPlatform::resize") << std::endl;
+        _application->resize(width, height);
+        cout << format("--> IPlatform::resize") << std::endl;
+    }
+
     UnixPlatform::UnixPlatform(std::shared_ptr<IWindow> window, std::shared_ptr<IApplication> application)
     {
         cout << format("--> UnixPlatform::UnixPlatform") << std::endl;
         // cannot initialzie parents member in the ctor init list
         this->_window = window;
         this->_application = application;
+        this->_window->usePlatform(this);
         cout << format("<-- UnixPlatform::UnixPlatform") << std::endl;
     }
 
     UnixPlatform::~UnixPlatform()
     {
-        
     }
 }

@@ -145,3 +145,10 @@ compiler deduction maybe not what you expect.
 
 ## conversion between string and numerical types
 
+
+
+## optional 
+
+#include <optional> 
+
+?: typescript

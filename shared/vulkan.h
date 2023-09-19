@@ -66,6 +66,7 @@ namespace SharedUtils
         }
 
     private:
+        // dispatchable handle: pointer
         VkInstance _instance;
     };
 
