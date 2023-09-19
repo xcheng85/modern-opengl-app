@@ -27,11 +27,44 @@ namespace SharedUtils
 	VulkanRenderingContextValidationLayers::VulkanRenderingContextValidationLayers(std::vector<ConfigString> const &validationLayers)
 		: _validationLayers(validationLayers)
 	{
+		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
+		uint32_t instance_layer_count;
+		VK_CHECK(vkEnumerateInstanceLayerProperties(&instance_layer_count, nullptr));
+
+		std::vector<VkLayerProperties> supported_validation_layers(instance_layer_count);
+		VK_CHECK(vkEnumerateInstanceLayerProperties(&instance_layer_count, supported_validation_layers.data()));
+		// structural binding and c++ 17 range-based for
+		for (auto const &[layerName, specVersion, implementationVersion, description] : supported_validation_layers)
+		{
+			cout << format("{}, {}, {}, {}", layerName, specVersion, implementationVersion, description) << std::endl;
+		}
+		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
 	}
 
 	VulkanRenderingContextExtensions::VulkanRenderingContextExtensions(std::vector<ConfigString> const &extensions)
 		: _extensions(extensions)
 	{
+		cout << format("--> VulkanRenderingContextExtensions::VulkanRenderingContext") << std::endl;
+		uint32_t instance_extension_count;
+		VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, nullptr));
+
+		std::vector<VkExtensionProperties> available_instance_extensions(instance_extension_count);
+		VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, available_instance_extensions.data()));
+
+		// structural binding and c++ 17 range-based for
+		for (auto const &[extensionName, specVersion] : available_instance_extensions)
+		{
+			cout << format("{}, {}", extensionName, specVersion) << std::endl;
+		}
+		cout << format("<-- VulkanRenderingContextExtensions::VulkanRenderingContext") << std::endl;
+		// cannot use the following
+		// namespace rv = std::ranges::views;
+		// // lazy evaluation
+		//  auto v =  available_instance_extensions | rv::transform([](const VkExtensionProperties &s)
+		// 											  {
+		// 												cout << format("{}", s.specVersion) << std::endl;
+		// 											  	return s.specVersion;
+		// 											   });
 	}
 
 	VulkanRenderingHostAppSettings::VulkanRenderingHostAppSettings(const std::string name, const std::string version)
@@ -42,6 +75,7 @@ namespace SharedUtils
 	VulkanRenderingContext::VulkanRenderingContext(IRenderingContextValidationLayer &validationLayers, IRenderingContextExtensions &extensions, IRenderingHostAppSettings &hostAppSettings)
 	{
 		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
+
 		const VkApplicationInfo appinfo =
 			{
 				.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -150,7 +184,7 @@ namespace SharedUtils
 		return VK_FALSE;
 	}
 
-	VulkanRenderingDebugger::VulkanRenderingDebugger(IRenderingContext const& ctx)
+	VulkanRenderingDebugger::VulkanRenderingDebugger(IRenderingContext const &ctx)
 	{
 		cout << format("--> VulkanRenderingDebugger::VulkanRenderingDebugger") << std::endl;
 		{
