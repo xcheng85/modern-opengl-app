@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <optional>
 #include <memory>
+#include <any>
 #include <string>
 #include <vector>
 
@@ -22,12 +23,16 @@ namespace SharedUtils
         virtual bool ShouldClose() = 0;
         virtual void ProcessEvents() = 0;
         virtual void Close() = 0;
-        virtual void usePlatform(const IPlatform* const);
+        virtual void usePlatform(const IPlatform* const); 
+
+        // 
+        virtual any getWindow() = 0;
 
     protected:
         IPlatform* _platform;
     };
 
+    class VulkanRenderingSurface;
     class GlfwWindow : public IWindow
     {
     public:
@@ -39,6 +44,7 @@ namespace SharedUtils
         void Close() override;
         void usePlatform(const IPlatform* const p) override;
 
+        std::any getWindow() override;
     private:
         GLFWwindow *_window = nullptr;
     };

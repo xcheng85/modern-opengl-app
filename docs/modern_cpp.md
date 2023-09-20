@@ -146,9 +146,31 @@ compiler deduction maybe not what you expect.
 ## conversion between string and numerical types
 
 
-
 ## optional 
 
 #include <optional> 
 
 ?: typescript
+
+## any
+
+#include <any>
+any: typescript
+interface: golang
+
+any_cast
+
+## rtti (runtime type information)
+
+three main C++ language elements to run-time type information:
+The dynamic_cast operator.
+
+Used for conversion of polymorphic types.
+
+The typeid operator.
+
+Used for identifying the exact type of an object.
+
+The type_info class.
+
+Used to hold the type information returned by the typeid operator.

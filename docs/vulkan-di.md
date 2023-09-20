@@ -2,17 +2,21 @@
 
 ## High-level flow
 
-    createInstance();
+    query instance validation layer: done    entity: validation layer
 
-    setupDebugMessenger();
+    query instance extension: done  entity: extensions
 
-    createSurface();
+    createInstance(); done   entity: renderingContext
 
-    pickPhysicalDevice();
+    setupDebugMessenger(); done  entity: debugger
 
-    createLogicalDevice();
+    createSurface(); // entity surface from glfw: deps on instance + window 
 
-    createSwapChain();
+    pickPhysicalDevice();    entity: physical device
+
+    createLogicalDevice();   entity: logical device
+
+    createSwapChain();  entity: swapchine 
 
     createImageViews();
 

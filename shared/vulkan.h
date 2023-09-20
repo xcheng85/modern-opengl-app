@@ -47,12 +47,6 @@ namespace SharedUtils
     public:
         virtual ~IRenderingDebugger() noexcept = default;
     };
-    // surface depends also on osWindowsHandle: glfw for example, should not be in this shared lib
-    class IRenderingSurface
-    {
-    public:
-        virtual ~IRenderingSurface() noexcept = default;
-    };
 
     // vulkan imp
     class VulkanRenderingContext : public IRenderingContext

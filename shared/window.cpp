@@ -92,4 +92,8 @@ namespace SharedUtils
         IWindow::usePlatform(p);
         glfwSetWindowUserPointer(_window, const_cast<IPlatform*>(p));
     }
+
+    std::any GlfwWindow::getWindow(){
+        return this->_window;
+    }
 }
