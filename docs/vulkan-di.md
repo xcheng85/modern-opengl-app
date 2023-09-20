@@ -12,11 +12,19 @@
 
     createSurface(); // entity surface from glfw: deps on instance + window 
 
-    pickPhysicalDevice();    entity: physical device
+    
+    // physical devices maybe more than one, criteria, 
+    // vksurface, computing and etc. 
+
+
+    pickPhysicalDevice();    entity: physical device, find suitable devide based on criteria. 
+
+
+
 
     createLogicalDevice();   entity: logical device
 
-    createSwapChain();  entity: swapchine 
+    createSwapChain();  entity: swap chain, deps on surface + logic device
 
     createImageViews();
 

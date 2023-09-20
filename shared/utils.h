@@ -3,12 +3,20 @@
 #include <string>
 #include <vector>
 #include <ranges>
+#include <cassert>
 // ranges::copy
 #include <algorithm>
+
+
 
 namespace SharedUtils
 {
     using namespace std;
+
+    #define VK_CHECK(value) SharedUtils::CHECK(value == VK_SUCCESS, __FILE__, __LINE__);
+
+    // forward declaration to avoid multiple definition.
+    void CHECK(bool check, const char *fileName, int lineNumber);
 
     int endsWith(const char *s, const char *part);
 

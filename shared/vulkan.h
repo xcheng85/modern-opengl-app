@@ -11,7 +11,6 @@
 #include "di.hpp"
 #include "utils.h"
 
-#define VK_CHECK(value) SharedUtils::CHECK(value == VK_SUCCESS, __FILE__, __LINE__);
 
 namespace SharedUtils
 {

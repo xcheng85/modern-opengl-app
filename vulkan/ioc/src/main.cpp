@@ -11,6 +11,7 @@
 #include "shared/window.h"
 #include "shared/application.h"
 #include "shared/surface.h"
+#include "shared/device.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -30,7 +31,8 @@ class IocApplication : public Application
 public:
     IocApplication(
         std::shared_ptr<IRenderingDebugger>,
-        std::shared_ptr<IRenderingSurface>) : Application()
+        std::shared_ptr<IRenderingSurface>,
+        std::shared_ptr<IPhysicalDevices>) : Application()
     {
         cout << "Ioc ctor" << std::endl;
     };
@@ -57,6 +59,7 @@ int main()
             di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
             di::bind<IRenderingContext>().to<VulkanRenderingContext>(),
             di::bind<IRenderingSurface>().to<VulkanRenderingSurface>(),
+            di::bind<IPhysicalDevices>().to<VulkanPhysicalDevices>(),
             di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
     };
 

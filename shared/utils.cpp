@@ -12,6 +12,16 @@ using namespace std;
 
 namespace SharedUtils
 {
+
+	void CHECK(bool check, const char *fileName, int lineNumber)
+	{
+		if (!check)
+		{
+			printf("CHECK() failed at %s:%i\n", fileName, lineNumber);
+			assert(false);
+			exit(EXIT_FAILURE);
+		}
+	}
 	int endsWith(const char *s, const char *part)
 	{
 		return (strstr(s, part) - s) == (strlen(s) - strlen(part));
