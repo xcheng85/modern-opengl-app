@@ -174,3 +174,5 @@ Used for identifying the exact type of an object.
 The type_info class.
 
 Used to hold the type information returned by the typeid operator.
+
+## lamda and capture by value, reference, this, etc.

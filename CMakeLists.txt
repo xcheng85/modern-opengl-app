@@ -46,3 +46,4 @@ target_sources(SharedUtils PRIVATE
 add_subdirectory(opengl/hello-world)
 add_subdirectory(vulkan/shader-compilation)
 add_subdirectory(vulkan/ioc)
+add_subdirectory(di/test-vector)

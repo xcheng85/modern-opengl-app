@@ -17,6 +17,7 @@ namespace SharedUtils
     {
     public:
         virtual ~IRenderingSurface() noexcept = default;
+        virtual std::any getSurface() = 0;
     };
 
     class VulkanRenderingSurface : public IRenderingSurface
@@ -24,6 +25,9 @@ namespace SharedUtils
     public:
         explicit VulkanRenderingSurface(std::shared_ptr<IWindow>, std::shared_ptr<IRenderingContext>);
         virtual ~VulkanRenderingSurface();
+        inline std::any getSurface() override {
+            return _surface;
+        }
     private:
         VkSurfaceKHR _surface;
     };

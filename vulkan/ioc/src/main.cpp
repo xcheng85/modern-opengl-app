@@ -32,7 +32,8 @@ public:
     IocApplication(
         std::shared_ptr<IRenderingDebugger>,
         std::shared_ptr<IRenderingSurface>,
-        std::shared_ptr<IPhysicalDevices>) : Application()
+        std::shared_ptr<IPhysicalDeviceList>,
+        std::shared_ptr<ILogicalDevice>) : Application()
     {
         cout << "Ioc ctor" << std::endl;
     };
@@ -51,72 +52,49 @@ int main()
             di::bind<IApplication>().to<IocApplication>());
     };
 
-    auto vulkan_module = []
+    std::initializer_list<std::string> validationLayers = {
+        "VK_LAYER_KHRONOS_validation",
+    };
+
+    std::initializer_list<std::string> instanceExts = {
+        "VK_KHR_surface",
+        "VK_KHR_xcb_surface",
+        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+        VK_EXT_DEBUG_REPORT_EXTENSION_NAME,
+        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME};
+
+    std::initializer_list<std::string> desiredDeviceExts = {
+        "VK_KHR_get_memory_requirements2",
+        "VK_KHR_dedicated_allocation",
+        "VK_KHR_get_memory_requirements2",
+        "VK_KHR_dedicated_allocation",
+        // "VK_KHR_performance_query",
+        "VK_EXT_host_query_reset",
+        "VK_KHR_swapchain",
+        VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
+        };
+    // lamda + copy capture
+    auto vulkan_module = [validationLayers, instanceExts, desiredDeviceExts]
     {
         return di::make_injector(
-            di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
-            di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
+            di::bind<string[]>.named(VALIDATION_LAYERS).to(validationLayers),
+            di::bind<string[]>.named(INSTANCE_EXTENSIONS).to(instanceExts),
             di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
             di::bind<IRenderingContext>().to<VulkanRenderingContext>(),
             di::bind<IRenderingSurface>().to<VulkanRenderingSurface>(),
-            di::bind<IPhysicalDevices>().to<VulkanPhysicalDevices>(),
+            di::bind<IPhysicalDeviceList>().to<VulkanPhysicalDeviceList>(),
+            di::bind<ILogicalDevice>().to<VulkanLogicalDevice>(),
+            di::bind<string[]>.named(DESIRE_PHYSICAL_DEVICE_EXTS).to(desiredDeviceExts),
+            di::bind<VkPhysicalDeviceFeatures>().named(DESIRE_PHYSICAL_DEVICE_FEATURES).to(VkPhysicalDeviceFeatures{}),
+            di::bind<VkQueueFlagBits>().named(DESIRE_QUEUE_FAMILY_CAPABILITY).to(VK_QUEUE_GRAPHICS_BIT),
             di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
     };
 
     auto injector = di::make_injector(framework_module(), vulkan_module());
-
-    // auto injector = di::make_injector(
-    //     di::bind<IWindow>().to<GlfwWindow>(),
-    //     di::bind<IApplication>().to<IocApplication>()
-    //     // di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
-    //     // di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
-    //     // di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
-    //     // di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1")
-    // );
-
     auto platform = injector.create<std::unique_ptr<UnixPlatform>>();
     platform.get()->main_loop();
 
     glslang_finalize_process();
     return 0;
-    /*
-    glslang_initialize_process();
-
-    volkInitialize();
-
-    glfwInit();
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow *window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-    // uint32_t extensionCount = 0;
-    // vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    // std::cout << extensionCount << " extensions supported\n";
-
-    auto injector = di::make_injector(
-        di::bind<IRenderingContextValidationLayer>().to<VulkanRenderingContextValidationLayers>(),
-        di::bind<IRenderingContextExtensions>().to<VulkanRenderingContextExtensions>(),
-        di::bind<IRenderingHostAppSettings>().to<VulkanRenderingHostAppSettings>(),
-
-        // di::bind<ConfigString[]>().named(VALIDATION_LAYERS).to({ConfigString{"VK_LAYER_KHRONOS_validation"}}),
-        // di::bind<ConfigString[]>().named(VULKAN_EXTENSIONS).to({ConfigString{"VK_KHR_surface"}, ConfigString{
-        //                                                                                             "VK_KHR_surface"
-        //                                                                                         },
-        //                                                         ConfigString{"VK_KHR_surface"}, ConfigString{"VK_KHR_surface"}}),
-        di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
-
-    injector.create<VulkanRenderingDebugger>();
-
-    while (!glfwWindowShouldClose(window))
-    {
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-
-    glfwTerminate();
-
-    glslang_finalize_process();
-
-    return 0;*/
 }

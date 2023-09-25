@@ -25,8 +25,7 @@ namespace SharedUtils
         virtual void Close() = 0;
         virtual void usePlatform(const IPlatform* const); 
 
-        // 
-        virtual any getWindow() = 0;
+        virtual std::any getWindow() = 0;
 
     protected:
         IPlatform* _platform;

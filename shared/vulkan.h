@@ -11,7 +11,6 @@
 #include "di.hpp"
 #include "utils.h"
 
-
 namespace SharedUtils
 {
     // ioc
@@ -20,19 +19,6 @@ namespace SharedUtils
     public:
         virtual ~IRenderingContext() noexcept = default;
         virtual const VkInstance getInstance() const = 0;
-    };
-    // Validation layers are optional components validate api calls
-    class IRenderingContextValidationLayer
-    {
-    public:
-        virtual ~IRenderingContextValidationLayer() noexcept = default;
-        virtual std::vector<ConfigString> getValidationLayers() = 0;
-    };
-    class IRenderingContextExtensions
-    {
-    public:
-        virtual ~IRenderingContextExtensions() noexcept = default;
-        virtual std::vector<ConfigString> getExtensions() = 0;
     };
     class IRenderingHostAppSettings
     {
@@ -48,11 +34,16 @@ namespace SharedUtils
     };
 
     // vulkan imp
+    static auto VALIDATION_LAYERS = [] {};
+    static auto INSTANCE_EXTENSIONS = [] {};
     class VulkanRenderingContext : public IRenderingContext
     {
     public:
-        // some c_str requires non-const
-        VulkanRenderingContext(IRenderingContextValidationLayer &, IRenderingContextExtensions &, IRenderingHostAppSettings &);
+        BOOST_DI_INJECT(VulkanRenderingContext,
+                        (named = VALIDATION_LAYERS) std::vector<std::string> const &,
+                        (named = INSTANCE_EXTENSIONS) std::vector<std::string> const &,
+                        IRenderingHostAppSettings &);
+        // VulkanRenderingContext(IRenderingContextValidationLayer &, IRenderingContextExtensions &, IRenderingHostAppSettings &);
         inline const VkInstance getInstance() const override
         {
             return this->_instance;
@@ -61,34 +52,6 @@ namespace SharedUtils
     private:
         // dispatchable handle: pointer
         VkInstance _instance;
-    };
-
-    static auto VALIDATION_LAYERS = [] {};
-    class VulkanRenderingContextValidationLayers : public IRenderingContextValidationLayer
-    {
-    public:
-        // explicit VulkanRenderingContextValidationLayers(std::vector<std::string> const &validationLayers);
-        BOOST_DI_INJECT(VulkanRenderingContextValidationLayers, (named = VALIDATION_LAYERS) std::vector<ConfigString> const &validationLayers);
-        inline std::vector<ConfigString> getValidationLayers() override
-        {
-            return _validationLayers;
-        };
-
-    private:
-        std::vector<ConfigString> _validationLayers;
-    };
-    static auto VULKAN_EXTENSIONS = [] {};
-    class VulkanRenderingContextExtensions : public IRenderingContextExtensions
-    {
-    public:
-        BOOST_DI_INJECT(VulkanRenderingContextExtensions, (named = VULKAN_EXTENSIONS) std::vector<ConfigString> const &extensions);
-        inline std::vector<ConfigString> getExtensions() override
-        {
-            return _extensions;
-        };
-
-    private:
-        std::vector<ConfigString> _extensions;
     };
 
     static auto APP_NAME = [] {};
@@ -114,7 +77,7 @@ namespace SharedUtils
     class VulkanRenderingDebugger : public IRenderingDebugger
     {
     public:
-        VulkanRenderingDebugger(IRenderingContext const& ctx);
+        VulkanRenderingDebugger(IRenderingContext const &ctx);
 
     private:
         VkDebugUtilsMessengerEXT _messenger;

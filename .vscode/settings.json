@@ -92,6 +92,7 @@
         "locale": "cpp",
         "ranges": "cpp",
         "__config": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "__locale": "cpp"
     }
 }

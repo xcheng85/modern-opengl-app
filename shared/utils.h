@@ -7,8 +7,6 @@
 // ranges::copy
 #include <algorithm>
 
-
-
 namespace SharedUtils
 {
     using namespace std;
@@ -26,22 +24,16 @@ namespace SharedUtils
 
     void printShaderSource(const char *text);
 
-    // required by boost ext di
-    struct ConfigString : std::string
-    {
-        using std::string::string;
-    };
-
     // versioning of function
     inline namespace
     {
         namespace rv = std::ranges::views;
         namespace rg = std::ranges;
 
-        void convert(std::vector<ConfigString> const &in, std::vector<const char *> &out)
+        void convert(std::vector<string> const &in, std::vector<const char *> &out)
         {
             out.resize(in.size());
-            auto v = in | rv::transform([](const ConfigString &s)
+            auto v = in | rv::transform([](const string &s)
                                         { return s.c_str(); });
             rg::copy(v, out.begin());
         }

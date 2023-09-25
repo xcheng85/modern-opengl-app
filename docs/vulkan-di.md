@@ -17,12 +17,11 @@
     // vksurface, computing and etc. 
 
 
-    pickPhysicalDevice();    entity: physical device, find suitable devide based on criteria. 
+    getPhysicalDevice();    entity: physical device, find suitable devide based on criteria. 
 
+    physicalDevicePicker(); 
 
-
-
-    createLogicalDevice();   entity: logical device
+    createLogicalDevice();   entity: logical device, deps on physics picker + 
 
     createSwapChain();  entity: swap chain, deps on surface + logic device
 

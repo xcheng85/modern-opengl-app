@@ -14,57 +14,58 @@ using namespace std;
 
 namespace SharedUtils
 {
+	// VulkanRenderingContextValidationLayers::VulkanRenderingContextValidationLayers(vector<string> const &validationLayers)
+	// 	: _validationLayers(validationLayers)
+	// {
+	// 	cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
+	// 	uint32_t instance_layer_count;
+	// 	VK_CHECK(vkEnumerateInstanceLayerProperties(&instance_layer_count, nullptr));
 
+	// 	std::vector<VkLayerProperties> supported_validation_layers(instance_layer_count);
+	// 	VK_CHECK(vkEnumerateInstanceLayerProperties(&instance_layer_count, supported_validation_layers.data()));
+	// 	// structural binding and c++ 17 range-based for
+	// 	for (auto const &[layerName, specVersion, implementationVersion, description] : supported_validation_layers)
+	// 	{
+	// 		cout << format("{}, {}, {}, {}", layerName, specVersion, implementationVersion, description) << std::endl;
+	// 	}
+	// 	cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
+	// }
 
-	VulkanRenderingContextValidationLayers::VulkanRenderingContextValidationLayers(std::vector<ConfigString> const &validationLayers)
-		: _validationLayers(validationLayers)
-	{
-		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
-		uint32_t instance_layer_count;
-		VK_CHECK(vkEnumerateInstanceLayerProperties(&instance_layer_count, nullptr));
+	// VulkanRenderingContextExtensions::VulkanRenderingContextExtensions(std::vector<string> const &extensions)
+	// 	: _extensions(extensions)
+	// {
+	// 	cout << format("--> VulkanRenderingContextExtensions::VulkanRenderingContext") << std::endl;
+	// 	uint32_t instance_extension_count;
+	// 	VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, nullptr));
 
-		std::vector<VkLayerProperties> supported_validation_layers(instance_layer_count);
-		VK_CHECK(vkEnumerateInstanceLayerProperties(&instance_layer_count, supported_validation_layers.data()));
-		// structural binding and c++ 17 range-based for
-		for (auto const &[layerName, specVersion, implementationVersion, description] : supported_validation_layers)
-		{
-			cout << format("{}, {}, {}, {}", layerName, specVersion, implementationVersion, description) << std::endl;
-		}
-		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
-	}
+	// 	std::vector<VkExtensionProperties> available_instance_extensions(instance_extension_count);
+	// 	VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, available_instance_extensions.data()));
 
-	VulkanRenderingContextExtensions::VulkanRenderingContextExtensions(std::vector<ConfigString> const &extensions)
-		: _extensions(extensions)
-	{
-		cout << format("--> VulkanRenderingContextExtensions::VulkanRenderingContext") << std::endl;
-		uint32_t instance_extension_count;
-		VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, nullptr));
-
-		std::vector<VkExtensionProperties> available_instance_extensions(instance_extension_count);
-		VK_CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &instance_extension_count, available_instance_extensions.data()));
-
-		// structural binding and c++ 17 range-based for
-		for (auto const &[extensionName, specVersion] : available_instance_extensions)
-		{
-			cout << format("{}, {}", extensionName, specVersion) << std::endl;
-		}
-		cout << format("<-- VulkanRenderingContextExtensions::VulkanRenderingContext") << std::endl;
-		// cannot use the following
-		// namespace rv = std::ranges::views;
-		// // lazy evaluation
-		//  auto v =  available_instance_extensions | rv::transform([](const VkExtensionProperties &s)
-		// 											  {
-		// 												cout << format("{}", s.specVersion) << std::endl;
-		// 											  	return s.specVersion;
-		// 											   });
-	}
+	// 	// structural binding and c++ 17 range-based for
+	// 	for (auto const &[extensionName, specVersion] : available_instance_extensions)
+	// 	{
+	// 		cout << format("{}, {}", extensionName, specVersion) << std::endl;
+	// 	}
+	// 	cout << format("<-- VulkanRenderingContextExtensions::VulkanRenderingContext") << std::endl;
+	// 	// cannot use the following
+	// 	// namespace rv = std::ranges::views;
+	// 	// // lazy evaluation
+	// 	//  auto v =  available_instance_extensions | rv::transform([](const VkExtensionProperties &s)
+	// 	// 											  {
+	// 	// 												cout << format("{}", s.specVersion) << std::endl;
+	// 	// 											  	return s.specVersion;
+	// 	// 											   });
+	// }
 
 	VulkanRenderingHostAppSettings::VulkanRenderingHostAppSettings(const std::string name, const std::string version)
 		: _name(name), _version(version)
 	{
 	}
 
-	VulkanRenderingContext::VulkanRenderingContext(IRenderingContextValidationLayer &validationLayers, IRenderingContextExtensions &extensions, IRenderingHostAppSettings &hostAppSettings)
+	VulkanRenderingContext::VulkanRenderingContext(
+		std::vector<std::string> const &validationLayers,
+		std::vector<std::string> const &instanceExtensions,
+		IRenderingHostAppSettings &hostAppSettings)
 	{
 		cout << format("--> VulkanRenderingContext::VulkanRenderingContext") << std::endl;
 
@@ -77,58 +78,56 @@ namespace SharedUtils
 				.pEngineName = "No Engine",
 				.engineVersion = VK_MAKE_VERSION(1, 0, 0),
 				.apiVersion = VK_API_VERSION_1_3};
-		// di string vector issues.
-		// auto const &t = validationLayers.getValidationLayers();
-		// auto const &e = extensions.getExtensions();
-		// // auto allLayers = std::accumulate(
-		// // 					 std::next(validationLayers.getValidationLayers().begin()), validationLayers.getValidationLayers().end(),
-		// // 					 validationLayers.getValidationLayers()[0],
-		// // 					 [](std::string a, std::string b)
-		// // 					 {
-		// // 						 return a + b;
-		// // 					 })
-		// // 					 .c_str();
-		// // auto allExts = std::accumulate(
-		// // 				   std::next(extensions.getExtensions().begin()), extensions.getExtensions().end(),
-		// // 				   extensions.getExtensions()[0],
-		// // 				   [](std::string a, std::string b)
-		// // 				   {
-		// // 					   return a + b;
-		// // 				   })
-		// // 				   .c_str();
-		// std::vector<const char *> layer_names(validationLayers.getValidationLayers().size());
-		// // std::transform(validationLayers.getValidationLayers().begin(), validationLayers.getValidationLayers().end(), layer_names.begin(), [](const std::string &s)
-		// // 			   { return s.c_str(); });
-		// std::vector<const char *> extensitions_names(extensions.getExtensions().size());
-		// // std::transform(extensions.getExtensions().begin(), extensions.getExtensions().end(), extensitions_names.begin(), [](const std::string &s)
-		// // 			   { return s.c_str(); });
-		// convert(t, layer_names);
-		// convert(e, extensitions_names);
 
-		// break the di design
-		const std::vector<const char *> hack_layers =
-			{
-				"VK_LAYER_KHRONOS_validation"};
+		// auto allLayers = std::accumulate(
+		// 					 std::next(validationLayers.getValidationLayers().begin()), validationLayers.getValidationLayers().end(),
+		// 					 validationLayers.getValidationLayers()[0],
+		// 					 [](std::string a, std::string b)
+		// 					 {
+		// 						 return a + b;
+		// 					 })
+		// 					 .c_str();
+		// auto allExts = std::accumulate(
+		// 				   std::next(extensions.getExtensions().begin()), extensions.getExtensions().end(),
+		// 				   extensions.getExtensions()[0],
+		// 				   [](std::string a, std::string b)
+		// 				   {
+		// 					   return a + b;
+		// 				   })
+		// 				   .c_str();
+		std::vector<const char *> layer_names(validationLayers.size());
+		// std::transform(validationLayers.getValidationLayers().begin(), validationLayers.getValidationLayers().end(), layer_names.begin(), [](const std::string &s)
+		// 			   { return s.c_str(); });
+		std::vector<const char *> extensitions_names(instanceExtensions.size());
+		// std::transform(extensions.getExtensions().begin(), extensions.getExtensions().end(), extensitions_names.begin(), [](const std::string &s)
+		// 			   { return s.c_str(); });
+		convert(validationLayers, layer_names);
+		convert(instanceExtensions, extensitions_names);
 
-		const std::vector<const char *> hack_extensions =
-		{
-			"VK_KHR_surface",
-#if defined(_WIN32)
-			"VK_KHR_win32_surface"
-#endif
-#if defined(__APPLE__)
-			"VK_MVK_macos_surface"
-#endif
-#if defined(__linux__)
-			"VK_KHR_xcb_surface"
-#endif
-			,
-			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-			VK_EXT_DEBUG_REPORT_EXTENSION_NAME
-			/* for indexed textures */
-			,
-			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
-		};
+		// 		// break the di design
+		// 		const std::vector<const char *> hack_layers =
+		// 			{
+		// 				"VK_LAYER_KHRONOS_validation"};
+
+		// 		const std::vector<const char *> hack_extensions =
+		// 		{
+		// 			"VK_KHR_surface",
+		// #if defined(_WIN32)
+		// 			"VK_KHR_win32_surface"
+		// #endif
+		// #if defined(__APPLE__)
+		// 			"VK_MVK_macos_surface"
+		// #endif
+		// #if defined(__linux__)
+		// 			"VK_KHR_xcb_surface"
+		// #endif
+		// 			,
+		// 			VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+		// 			VK_EXT_DEBUG_REPORT_EXTENSION_NAME
+		// 			/* for indexed textures */
+		// 			,
+		// 			VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME
+		// 		};
 
 		const VkInstanceCreateInfo createInfo =
 			{
@@ -136,10 +135,10 @@ namespace SharedUtils
 				.pNext = nullptr,
 				.flags = 0,
 				.pApplicationInfo = &appinfo,
-				.enabledLayerCount = static_cast<uint32_t>(hack_layers.size()),
-				.ppEnabledLayerNames = hack_layers.data(),
-				.enabledExtensionCount = static_cast<uint32_t>(hack_extensions.size()),
-				.ppEnabledExtensionNames = hack_extensions.data()};
+				.enabledLayerCount = static_cast<uint32_t>(layer_names.size()),
+				.ppEnabledLayerNames = layer_names.data(),
+				.enabledExtensionCount = static_cast<uint32_t>(extensitions_names.size()),
+				.ppEnabledExtensionNames = extensitions_names.data()};
 
 		VK_CHECK(vkCreateInstance(&createInfo, nullptr, &_instance));
 		// This function will load all required Vulkan entrypoints, including all extensions; you can use Vulkan from here on as usual.
