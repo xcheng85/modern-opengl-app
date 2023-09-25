@@ -12,6 +12,7 @@
 #include "shared/application.h"
 #include "shared/surface.h"
 #include "shared/device.h"
+#include "shared/queue.h"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -33,7 +34,8 @@ public:
         std::shared_ptr<IRenderingDebugger>,
         std::shared_ptr<IRenderingSurface>,
         std::shared_ptr<IPhysicalDeviceList>,
-        std::shared_ptr<ILogicalDevice>) : Application()
+        std::shared_ptr<ILogicalDevice>,
+        std::shared_ptr<IDeviceQueueList>) : Application()
     {
         cout << "Ioc ctor" << std::endl;
     };
@@ -68,12 +70,11 @@ int main()
         "VK_KHR_dedicated_allocation",
         "VK_KHR_get_memory_requirements2",
         "VK_KHR_dedicated_allocation",
-        // "VK_KHR_performance_query",
+        // "VK_KHR_performance_query", // my gpu not support it
         "VK_EXT_host_query_reset",
         "VK_KHR_swapchain",
         VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME
-        };
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME};
     // lamda + copy capture
     auto vulkan_module = [validationLayers, instanceExts, desiredDeviceExts]
     {
@@ -88,6 +89,7 @@ int main()
             di::bind<string[]>.named(DESIRE_PHYSICAL_DEVICE_EXTS).to(desiredDeviceExts),
             di::bind<VkPhysicalDeviceFeatures>().named(DESIRE_PHYSICAL_DEVICE_FEATURES).to(VkPhysicalDeviceFeatures{}),
             di::bind<VkQueueFlagBits>().named(DESIRE_QUEUE_FAMILY_CAPABILITY).to(VK_QUEUE_GRAPHICS_BIT),
+            di::bind<IDeviceQueueList>().to<VulkanLogicDeviceQueueList>(),
             di::bind<std::string>().named(APP_NAME).to("VULKAN_IOC"), di::bind<std::string>().named(APP_VERSION).to("0.0.1"));
     };
 

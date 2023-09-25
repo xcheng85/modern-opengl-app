@@ -6,6 +6,7 @@
 #include "device.h"
 #include "surface.h"
 #include "vulkan.h"
+#include "queue.h"
 #include "utils.h"
 
 using namespace std;
@@ -111,7 +112,8 @@ namespace SharedUtils
         {
             auto deviceProperties = any_cast<VkPhysicalDeviceProperties>(pDevice->getProperties());
             cout << format("deviceName: {}", deviceProperties.deviceName) << endl;
-            if(deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
+            if (deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+            {
                 continue;
             }
 
@@ -150,42 +152,39 @@ namespace SharedUtils
             auto const &vkPDevices = std::static_pointer_cast<VulkanPhysicalDevice>(pDevice);
             auto const &vkSurface = std::any_cast<VkSurfaceKHR>(rendSurface->getSurface());
             auto const &queueFamilies = vkPDevices->getQueueFamilyProperties();
-            
+
             // ask for create multiple queues for one family within a device
-            struct QueueInfo
-            {
-                uint32_t familyIndex;
-                vector<float> priorities;
-            };
             // queue in family will be created when we create the logical device
-            std::vector<QueueInfo> queueInfoFiltered;
+            // std::vector<QueueInfo> queueInfoFiltered;
             uint32_t familyIndex{0};
             for (auto const &qf : queueFamilies)
             {
-                bool isDeviceSupportPresentSurface = false;
-                for (uint32_t queue_idx = 0; queue_idx < qf.queueCount; queue_idx++)
-                {
-                    // ADM RADV RENOIR can support this surface as well
-                    if (vkPDevices->isPresentSupported(vkSurface, queue_idx))
-                    {
-                        isDeviceSupportPresentSurface = true;
-                    }
-                }
+                QueueInfo tmp;
+                tmp.familyIndex = familyIndex++;
 
-                if (isDeviceSupportPresentSurface && qf.queueCount > 0 && qf.queueFlags & cap)
+                if (qf.queueCount > 0 && qf.queueFlags & cap)
                 {
-                    QueueInfo tmp{familyIndex++, vector<float>(qf.queueCount, 0.5f)};
-                    queueInfoFiltered.push_back(tmp);
+                    for (uint32_t queue_idx = 0; queue_idx < qf.queueCount; queue_idx++)
+                    {
+                        // ADM RADV RENOIR can support this surface as well
+                        if (vkPDevices->isPresentSupported(vkSurface, queue_idx))
+                        {
+                            tmp.priorities.push_back(0.5f);
+                            tmp.queueIndexes.push_back(queue_idx);
+                        }
+                    }
+                    _queueInfo.push_back(tmp);
                 }
             }
             // uniform init
-            auto queueInfoSize = queueInfoFiltered.size();
-            if(0 == queueInfoSize){
+            auto queueInfoSize = _queueInfo.size();
+            if (0 == queueInfoSize)
+            {
                 continue;
             }
             vector<VkDeviceQueueCreateInfo> queueCreateInfos(queueInfoSize, {VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO});
             uint32_t currIdx{0};
-            for (auto const &qf : queueInfoFiltered)
+            for (auto const &qf : _queueInfo)
             {
                 auto &queue_create_info = queueCreateInfos[currIdx++];
                 queue_create_info.queueFamilyIndex = qf.familyIndex;

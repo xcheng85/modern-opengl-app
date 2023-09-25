@@ -23,6 +23,8 @@
 
     createLogicalDevice();   entity: logical device, deps on physics picker + 
 
+    get
+
     createSwapChain();  entity: swap chain, deps on surface + logic device
 
     createImageViews();
