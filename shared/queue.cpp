@@ -32,9 +32,10 @@ namespace SharedUtils
 
         for (auto const &f : queueInfo)
         {
-            for (auto const &q : f.queueIndexes)
+            //for (auto const &q : f.queueIndexes)
+            for (uint32_t queueIndex = 0U; queueIndex < f.queueIndexes.size(); ++queueIndex)
             {
-                _queues.push_back(make_shared<VulkanLogicDeviceQueue>(vkLogicDevice, f.familyIndex, q));
+                _queues.push_back(make_shared<VulkanLogicDeviceQueue>(vkLogicDevice, f.familyIndex, queueIndex));
             }
         }
 
