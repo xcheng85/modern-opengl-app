@@ -73,6 +73,7 @@ namespace SharedUtils
         virtual ~ILogicalDevice() noexcept = default;
         virtual std::any getDevice() = 0;
         virtual std::any getQueueInfo() = 0;
+        virtual std::any getPhysicalDevice() = 0;
     };
 
     struct QueueInfo;
@@ -104,8 +105,13 @@ namespace SharedUtils
             return _queueInfo;
         }
 
+        inline any getPhysicalDevice() override {
+            return _pDevice;
+        }
+
     private:
         VkDevice _device;
         std::vector<QueueInfo> _queueInfo;
+        VkPhysicalDevice _pDevice;
     };
 }

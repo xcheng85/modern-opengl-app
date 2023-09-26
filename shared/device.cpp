@@ -200,7 +200,8 @@ namespace SharedUtils
             logicalDeviceCreateInfo.ppEnabledExtensionNames = supported.data();
             logicalDeviceCreateInfo.pEnabledFeatures = &features;
 
-            VK_CHECK(vkCreateDevice(std::any_cast<VkPhysicalDevice>(pDevice->getDevice()), &logicalDeviceCreateInfo, nullptr, &_device));
+            this->_pDevice = std::any_cast<VkPhysicalDevice>(pDevice->getDevice());
+            VK_CHECK(vkCreateDevice(_pDevice, &logicalDeviceCreateInfo, nullptr, &_device));
             break;
         }
         cout << format("<-- VulkanLogicalDevice::VulkanLogicalDevice") << endl;

@@ -72,7 +72,7 @@ int main()
         "VK_KHR_dedicated_allocation",
         // "VK_KHR_performance_query", // my gpu not support it
         "VK_EXT_host_query_reset",
-        "VK_KHR_swapchain",
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         VK_KHR_MAINTENANCE3_EXTENSION_NAME,
         VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME};
     // lamda + copy capture
