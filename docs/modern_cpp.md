@@ -176,3 +176,8 @@ The type_info class.
 Used to hold the type information returned by the typeid operator.
 
 ## lamda and capture by value, reference, this, etc.
+
+
+## push_back vs emplace_back
+
+emplace_back is more performant, avoid temp object

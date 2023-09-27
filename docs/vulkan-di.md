@@ -23,7 +23,7 @@
 
     createLogicalDevice();   entity: logical device, deps on physics picker + 
 
-    get
+    getDeviceQueue(); done
 
     createSwapChain();  entity: swap chain, deps on surface + logic device
 
