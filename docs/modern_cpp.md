@@ -177,7 +177,10 @@ Used to hold the type information returned by the typeid operator.
 
 ## lamda and capture by value, reference, this, etc.
 
+## lamda with trailing return type: more like typescript
 
 ## push_back vs emplace_back
 
 emplace_back is more performant, avoid temp object
+
+## std::to_string like JSON.stringfy in ts, golang's JSON encode/decode

@@ -18,8 +18,8 @@ namespace SharedUtils
         VkPresentModeKHR const &desiredPresentMode,
         const uint32_t desiredImageCount,
         VkExtent2D const &desiredImageExtent,
-        std::set<VkImageUsageFlagBits> const &usage,
-        VkSurfaceTransformFlagBitsKHR const &transform,
+        std::set<VkImageUsageFlagBits> const &desiredImageUsage,
+        VkSurfaceTransformFlagBitsKHR const &desiredTransform,
         VkSurfaceFormatKHR const &desiredFormat,
         const uint32_t desiredImageLayers)
     {
@@ -52,7 +52,7 @@ namespace SharedUtils
         cout << std::format("Surface supports the following surface formats:");
         for (auto &surface_format : surface_formats)
         {
-            cout << std::format("{}", surface_format) << std::endl;
+            cout << std::format("format: {}, colorSpace: {}", to_string(surface_format.format), to_string(surface_format.colorSpace)) << std::endl;
         }
 
         VkSwapchainCreateInfoKHR create_info{VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
@@ -78,7 +78,7 @@ namespace SharedUtils
 
         create_info.presentMode = desiredPresentMode;
         // lamda inside lamda
-        auto pickImageFormat = [&surface_formats](VkSurfaceFormatKHR const &desiredFormat)
+        auto pickSurfaceFormat = [&surface_formats](VkSurfaceFormatKHR const &desiredFormat)
         {
             auto surface_format_it = std::find_if(
                 surface_formats.begin(),
@@ -100,7 +100,9 @@ namespace SharedUtils
             }
             return *surface_format_it;
         };
-        auto [format, colorSpace] = pickImageFormat(desiredFormat);
+        // auto [format, colorSpace] = pickImageFormat(desiredFormat);
+        auto surfaceFormat = pickSurfaceFormat(desiredFormat);
+        auto [format, colorSpace] = surfaceFormat;
         create_info.imageFormat = format;
         create_info.imageColorSpace = colorSpace;
 
@@ -111,34 +113,74 @@ namespace SharedUtils
         };
         create_info.imageArrayLayers = clampImageLayers(desiredImageLayers);
         // image usage
-        auto pickImageUsasge = [&surface_formats](VkSurfaceFormatKHR const &desiredFormat)
+        // desired: set of VkImageUsageFlagBits
+        // supported usage bits: from the physical device + surface
+        // format_properties.optimalTilingFeatures: all the image usage that optimal Tiling supported.
+        // format_properties.linearTilingFeatures: all the image usage that linear Tiling supported.
+        VkFormatProperties format_properties;
+        vkGetPhysicalDeviceFormatProperties(pDevice, format, &format_properties);
+        auto validateImageUsage = [&surface_capabilities, &format_properties](std::set<VkImageUsageFlagBits> const &desiredImageUsage)
         {
-            auto surface_format_it = std::find_if(
-                surface_formats.begin(),
-                surface_formats.end(),
-                [&desiredFormat](const VkSurfaceFormatKHR &availabeSurfaceFormat)
-                {
-                    if (availabeSurfaceFormat.format == desiredFormat.format &&
-                        availabeSurfaceFormat.colorSpace == desiredFormat.colorSpace)
-                    {
-                        return true;
-                    }
-                    return false;
-                });
-
-            if (surface_format_it == surface_formats.end())
+            auto supportedImageUsage = surface_capabilities.supportedUsageFlags;
+            auto supportedFeaturesForFormat = format_properties.optimalTilingFeatures;
+            // all the image usage that support optimal tiling
+            // lamda with trailing return type: more like typescript
+            auto validateImageFormatFeatures = [](VkImageUsageFlagBits const &desiredImageUsageFlagBit, VkFormatFeatureFlags const &supportedFeaturesForFormat) -> bool
             {
-                // fall back to the first one
-                surface_format_it = surface_formats.begin();
+                switch (desiredImageUsageFlagBit)
+                {
+                case VK_IMAGE_USAGE_STORAGE_BIT:
+                    return VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT & supportedFeaturesForFormat;
+                default:
+                    return true;
+                }
+            };
+
+            for (auto imageUsageFlagBit : desiredImageUsage)
+            {
+                if ((imageUsageFlagBit & supportedImageUsage) && validateImageFormatFeatures(imageUsageFlagBit, supportedFeaturesForFormat))
+                {
+                }
+                else
+                {
+                    throw std::runtime_error(std::format("desired image usage bit {} is not supported", to_string(imageUsageFlagBit)));
+                }
             }
-            return *surface_format_it;
+        };
+        auto compositeToImageUsageFlags = [](std::set<VkImageUsageFlagBits> const &desiredImageUsage) -> VkImageUsageFlags
+        {
+            VkImageUsageFlags image_usage{};
+            for (auto flag : desiredImageUsage)
+            {
+                image_usage |= flag;
+            }
+            return image_usage;
+        };
+        validateImageUsage(desiredImageUsage);
+        create_info.imageUsage = compositeToImageUsageFlags(desiredImageUsage);
+
+        // transform of image before present
+        auto validateTransform = [&surface_capabilities](VkSurfaceTransformFlagBitsKHR const &desiredTransform)
+        {
+            auto supportedTransforms = surface_capabilities.supportedTransforms;
+            if (desiredTransform & supportedTransforms)
+            {
+            }
+            else
+            {
+                throw std::runtime_error(std::format("desired surface transform {} is not supported", to_string(desiredTransform)));
+            }
         };
 
-        create_info.imageUsage = properties.image_usage;
-        // create_info.preTransform = properties.pre_transform;
-        // create_info.compositeAlpha = properties.composite_alpha;
-        // create_info.oldSwapchain = properties.old_swapchain;
-        // create_info.surface = surface;
+        create_info.preTransform = desiredTransform;
+        // Alpha blending with swapchain surface with the rest of window
+        // VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR: disable alpha blending
+        // VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR,
+        // VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
+        // VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR};
+        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        create_info.oldSwapchain = VK_NULL_HANDLE;
+        create_info.surface = vkSurface;
 
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain") << std::endl;
     }
