@@ -21,7 +21,7 @@ namespace SharedUtils
         std::set<VkImageUsageFlagBits> const &desiredImageUsage,
         VkSurfaceTransformFlagBitsKHR const &desiredTransform,
         VkSurfaceFormatKHR const &desiredFormat,
-        const uint32_t desiredImageLayers)
+        const uint32_t desiredImageLayers) : _device(device)
     {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain") << std::endl;
 
@@ -182,10 +182,17 @@ namespace SharedUtils
         create_info.oldSwapchain = VK_NULL_HANDLE;
         create_info.surface = vkSurface;
 
+        auto vkDevice = std::any_cast<VkDevice>(device->getDevice());
+        VK_CHECK(vkCreateSwapchainKHR(vkDevice, &create_info, nullptr, &_swapchain));
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain") << std::endl;
     }
 
     VulkanSwapChain::~VulkanSwapChain()
     {
+        if (_swapchain != VK_NULL_HANDLE)
+        {
+            auto vkDevice = std::any_cast<VkDevice>(_device->getDevice());
+            vkDestroySwapchainKHR(vkDevice, _swapchain, nullptr);
+        }
     }
 }

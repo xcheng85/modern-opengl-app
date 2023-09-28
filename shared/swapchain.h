@@ -58,5 +58,7 @@ namespace SharedUtils
 
     private:
         VkSwapchainKHR _swapchain;
+        // for destroy swapchain
+        std::shared_ptr<ILogicalDevice> _device;
     };
 }
