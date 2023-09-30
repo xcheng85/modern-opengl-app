@@ -11,6 +11,7 @@ using namespace std;
 
 namespace SharedUtils
 {
+    class IContext;
     class IApplication
     {
     public:
@@ -34,6 +35,9 @@ namespace SharedUtils
         void init() override;
         void update() override;
         void resize(const uint32_t width, const uint32_t height) override;
-        void terminate() override; 
+        void terminate() override;
+
+    protected:
+        std::unique_ptr<IContext> _context{nullptr};
     };
 };

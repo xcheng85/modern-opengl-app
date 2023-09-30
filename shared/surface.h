@@ -11,7 +11,7 @@
 namespace SharedUtils
 {
     // ioc
-    class IRenderingContext;
+    class IInstance;
     class IWindow;
     class IRenderingSurface
     {
@@ -23,7 +23,7 @@ namespace SharedUtils
     class VulkanRenderingSurface : public IRenderingSurface
     {
     public:
-        explicit VulkanRenderingSurface(std::shared_ptr<IWindow>, std::shared_ptr<IRenderingContext>);
+        explicit VulkanRenderingSurface(std::shared_ptr<IWindow>, std::shared_ptr<IInstance>);
         virtual ~VulkanRenderingSurface();
         inline std::any getSurface() override {
             return _surface;

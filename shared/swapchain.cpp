@@ -17,11 +17,18 @@ namespace SharedUtils
         std::shared_ptr<IRenderingSurface> surface,
         VkPresentModeKHR const &desiredPresentMode,
         const uint32_t desiredImageCount,
-        VkExtent2D const &desiredImageExtent,
         std::set<VkImageUsageFlagBits> const &desiredImageUsage,
         VkSurfaceTransformFlagBitsKHR const &desiredTransform,
         VkSurfaceFormatKHR const &desiredFormat,
-        const uint32_t desiredImageLayers) : _device(device)
+        const uint32_t desiredImageLayers)
+        : _device(device),
+          _surface(surface),
+          _presentMode(desiredPresentMode),
+          _imageCount(desiredImageCount),
+          _imageUsageBits(desiredImageUsage),
+          _transform(desiredTransform),
+          _surfaceFormat(desiredFormat),
+          _imageLayers(desiredImageLayers)
     {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain") << std::endl;
 
@@ -42,6 +49,7 @@ namespace SharedUtils
         // cap
         VkSurfaceCapabilitiesKHR surface_capabilities{};
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pDevice, vkSurface, &surface_capabilities);
+        auto desiredImageExtent = surface_capabilities.currentExtent;
 
         // format
         uint32_t surface_format_count{0U};
@@ -185,6 +193,21 @@ namespace SharedUtils
         auto vkDevice = std::any_cast<VkDevice>(device->getDevice());
         VK_CHECK(vkCreateSwapchainKHR(vkDevice, &create_info, nullptr, &_swapchain));
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain") << std::endl;
+    }
+
+    VulkanSwapChain::VulkanSwapChain(ISwapChain &current)
+        : VulkanSwapChain(dynamic_cast<VulkanSwapChain &>(current))
+    {
+        cout << std::format("--> VulkanSwapChain::VulkanSwapChain(ISwapChain &current)") << std::endl;
+        cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(ISwapChain &current)") << std::endl;
+    }
+
+    VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)
+        : VulkanSwapChain(current._device, current._surface, current._presentMode, current._imageCount,
+                          current._imageUsageBits, current._transform, current._surfaceFormat, current._imageLayers)
+    {
+        cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
+        cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
     }
 
     VulkanSwapChain::~VulkanSwapChain()

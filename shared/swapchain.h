@@ -13,7 +13,7 @@
 // present mode
 // surface cap
 // number of images
-// w,h of image
+// w,h of image: fetch from wsi surface
 // usage
 // surface transform
 // format: rgba, precision, encoding color linear / non-linear space
@@ -49,16 +49,27 @@ namespace SharedUtils
                         std::shared_ptr<IRenderingSurface>,
                         (named = DESIRE_SWAPCHAIN_PRESENT_MODE) VkPresentModeKHR const &,
                         (named = DESIRE_SWAPCHAIN_IMAGES_COUNT) const uint32_t,
-                        (named = DESIRE_SWAPCHAIN_IMAGES_EXTENT) VkExtent2D const &,
                         (named = DESIRE_SWAPCHAIN_IMAGES_USAGE) std::set<VkImageUsageFlagBits> const &,
                         (named = DESIRE_SWAPCHAIN_IMAGES_TRANSFORMATION) VkSurfaceTransformFlagBitsKHR const &,
                         (named = DESIRE_SWAPCHAIN_IMAGES_FORMAT) VkSurfaceFormatKHR const &,
                         (named = DESIRE_SWAPCHAIN_IMAGES_LAYERS) const uint32_t);
+        // resize
+        // ctor overload
+        explicit VulkanSwapChain(ISwapChain &);
+        explicit VulkanSwapChain(VulkanSwapChain &);
+
         virtual ~VulkanSwapChain();
 
     private:
         VkSwapchainKHR _swapchain;
-        // for destroy swapchain
+        // for destroy swapchain and copy ctor
         std::shared_ptr<ILogicalDevice> _device;
+        std::shared_ptr<IRenderingSurface> _surface;
+        VkPresentModeKHR _presentMode;
+        uint32_t _imageCount;
+        std::set<VkImageUsageFlagBits> _imageUsageBits;
+        VkSurfaceTransformFlagBitsKHR _transform;
+        VkSurfaceFormatKHR _surfaceFormat;
+        uint32_t _imageLayers;
     };
 }

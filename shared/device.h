@@ -59,11 +59,11 @@ namespace SharedUtils
         std::vector<VkExtensionProperties> _extensions{};
     };
 
-    class IRenderingContext;
+    class IInstance;
     class VulkanPhysicalDeviceList : public IPhysicalDeviceList
     {
     public:
-        explicit VulkanPhysicalDeviceList(std::shared_ptr<IRenderingContext>);
+        explicit VulkanPhysicalDeviceList(std::shared_ptr<IInstance>);
         virtual ~VulkanPhysicalDeviceList();
     };
 

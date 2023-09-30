@@ -1,11 +1,12 @@
 #include <format>
 #include <iostream>
 #include "application.h"
+#include "context.h"
 
 using namespace std;
 namespace SharedUtils
 {
-    Application::Application()
+    Application::Application():
     {
         cout << format("--> Application::Application") << std::endl;
         cout << format("<-- Application::Application") << std::endl;

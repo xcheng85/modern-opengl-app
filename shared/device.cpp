@@ -5,7 +5,7 @@
 #include <ranges>
 #include "device.h"
 #include "surface.h"
-#include "vulkan.h"
+#include "instance.h"
 #include "queue.h"
 #include "utils.h"
 
@@ -72,13 +72,13 @@ namespace SharedUtils
         return present_supported;
     }
 
-    VulkanPhysicalDeviceList::VulkanPhysicalDeviceList(std::shared_ptr<IRenderingContext> renderingContext)
+    VulkanPhysicalDeviceList::VulkanPhysicalDeviceList(std::shared_ptr<IInstance> instance)
     {
         cout << format("--> VulkanPhysicalDeviceList::VulkanPhysicalDeviceList") << std::endl;
 
-        auto const &instance = renderingContext->getInstance();
+        auto const &vkInstance = any_cast<VkInstance>(instance->getInstance());
         uint32_t physical_device_count{0};
-        VK_CHECK(vkEnumeratePhysicalDevices(instance, &physical_device_count, nullptr));
+        VK_CHECK(vkEnumeratePhysicalDevices(vkInstance, &physical_device_count, nullptr));
 
         if (physical_device_count < 1)
         {
@@ -87,7 +87,7 @@ namespace SharedUtils
 
         std::vector<VkPhysicalDevice> physical_devices;
         physical_devices.resize(physical_device_count);
-        VK_CHECK(vkEnumeratePhysicalDevices(instance, &physical_device_count, physical_devices.data()));
+        VK_CHECK(vkEnumeratePhysicalDevices(vkInstance, &physical_device_count, physical_devices.data()));
 
         // Create gpus wrapper objects from the VkPhysicalDevice's
         for (auto &physical_device : physical_devices)

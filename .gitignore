@@ -1,5 +1,7 @@
 *.py
 
+external
+
 **/build
 **/bin
 
