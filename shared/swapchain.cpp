@@ -20,7 +20,8 @@ namespace SharedUtils
         std::set<VkImageUsageFlagBits> const &desiredImageUsage,
         VkSurfaceTransformFlagBitsKHR const &desiredTransform,
         VkSurfaceFormatKHR const &desiredFormat,
-        const uint32_t desiredImageLayers)
+        const uint32_t desiredImageLayers,
+         VkSwapchainKHR old)
         : _device(device),
           _surface(surface),
           _presentMode(desiredPresentMode),
@@ -187,7 +188,7 @@ namespace SharedUtils
         // VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
         // VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR};
         create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        create_info.oldSwapchain = VK_NULL_HANDLE;
+        create_info.oldSwapchain = old;
         create_info.surface = vkSurface;
 
         auto vkDevice = std::any_cast<VkDevice>(device->getDevice());
@@ -204,10 +205,18 @@ namespace SharedUtils
 
     VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)
         : VulkanSwapChain(current._device, current._surface, current._presentMode, current._imageCount,
-                          current._imageUsageBits, current._transform, current._surfaceFormat, current._imageLayers)
+                          current._imageUsageBits, current._transform, current._surfaceFormat, current._imageLayers, 
+                          std::any_cast<VkSwapchainKHR>(current.getSwapChain()))
     {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
+    }
+
+    VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other) noexcept{
+        cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other)") << std::endl;
+        _swapchain = other._swapchain;
+        other._swapchain = VK_NULL_HANDLE;
+        cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other)") << std::endl;
     }
 
     VulkanSwapChain::~VulkanSwapChain()

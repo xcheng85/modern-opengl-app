@@ -17,12 +17,17 @@ namespace SharedUtils
     VulkanContext::VulkanContext(
         std::shared_ptr<ILogicalDevice> device,
         std::shared_ptr<IRenderingSurface> surface,
-        std::unique_ptr<ISwapChain> swapchain) : _swapchain{std::move(swapchain)},
-                                                 _device(device),
-                                                 _surface(surface)
+        VkPresentModeKHR const &desiredPresentMode,
+        const uint32_t desiredImageCount,
+        std::set<VkImageUsageFlagBits> const &desiredImageUsage,
+        VkSurfaceTransformFlagBitsKHR const &desiredTransform,
+        VkSurfaceFormatKHR const &desiredFormat,
+        const uint32_t desiredImageLayers) : _device(device),
+                                             _surface(surface)
     {
         cout << format("--> VulkanContext::VulkanContext") << std::endl;
-
+        _swapchain = std::make_unique<VulkanSwapChain>(device, surface, desiredPresentMode, desiredImageCount,
+                                                       desiredImageUsage, desiredTransform, desiredFormat, desiredImageLayers);
         cout << format("<-- VulkanContext::VulkanContext") << std::endl;
     }
 
@@ -39,7 +44,6 @@ namespace SharedUtils
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pDevice, vkSurface, &surface_capabilities))
         // from wsi surface
         auto desiredImageExtent = surface_capabilities.currentExtent;
-
         _swapchain = std::make_unique<VulkanSwapChain>(*_swapchain);
     }
 }

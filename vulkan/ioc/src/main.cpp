@@ -34,8 +34,8 @@ class IocApplication : public Application
 {
 public:
     IocApplication(
-        std::shared_ptr<IContext>,
-        std::shared_ptr<IDeviceQueueList>) : Application()
+        std::unique_ptr<IContext> ctx,
+        std::shared_ptr<IDeviceQueueList>) : Application(std::move(ctx))
     {
         cout << "Ioc ctor" << std::endl;
     };

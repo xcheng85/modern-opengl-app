@@ -25,7 +25,7 @@
 
     getDeviceQueue(); done
 
-    createSwapChain();  entity: swap chain, deps on surface + logic device
+    createSwapChain();  entity: swap chain, deps on surface + logic device, old swap chain must be referenced during resize
 
     createImageViews();
 

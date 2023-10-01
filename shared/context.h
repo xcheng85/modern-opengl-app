@@ -24,13 +24,26 @@ namespace SharedUtils
     // vulkan context is injected into Application.
     // vulkan context should depends on logic device and wsi surface
     // bunch of
+    static auto DESIRE_SWAPCHAIN_PRESENT_MODE = [] {};
+    static auto DESIRE_SWAPCHAIN_IMAGES_COUNT = [] {};
+    static auto DESIRE_SWAPCHAIN_IMAGES_EXTENT = [] {};
+    static auto DESIRE_SWAPCHAIN_IMAGES_USAGE = [] {};
+    static auto DESIRE_SWAPCHAIN_IMAGES_TRANSFORMATION = [] {};
+    static auto DESIRE_SWAPCHAIN_IMAGES_FORMAT = [] {};
+    static auto DESIRE_SWAPCHAIN_IMAGES_LAYERS = [] {};
+    static auto OLD_SWAPCHAIN = [] {};
     class VulkanContext : public IContext
     {
     public:
         BOOST_DI_INJECT(VulkanContext,
                         std::shared_ptr<ILogicalDevice>,
                         std::shared_ptr<IRenderingSurface>,
-                        std::unique_ptr<ISwapChain>);
+                        (named = DESIRE_SWAPCHAIN_PRESENT_MODE) VkPresentModeKHR const &,
+                        (named = DESIRE_SWAPCHAIN_IMAGES_COUNT) const uint32_t,
+                        (named = DESIRE_SWAPCHAIN_IMAGES_USAGE) std::set<VkImageUsageFlagBits> const &,
+                        (named = DESIRE_SWAPCHAIN_IMAGES_TRANSFORMATION) VkSurfaceTransformFlagBitsKHR const &,
+                        (named = DESIRE_SWAPCHAIN_IMAGES_FORMAT) VkSurfaceFormatKHR const &,
+                        (named = DESIRE_SWAPCHAIN_IMAGES_LAYERS) const uint32_t);
         virtual ~VulkanContext();
         void resize(const uint32_t width, const uint32_t height) override;
 

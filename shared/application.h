@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -29,7 +30,8 @@ namespace SharedUtils
     class Application : public IApplication
     {
     public:
-        explicit Application();
+        explicit Application() = delete;
+        explicit Application(std::unique_ptr<IContext>);
         virtual ~Application();
 
         void init() override;
