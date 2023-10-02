@@ -27,6 +27,8 @@
 
     createSwapChain();  entity: swap chain, deps on surface + logic device, old swap chain must be referenced during resize
 
+    createSemaphore(): for acquire images to render in the swapchain
+
     createImageViews();
 
     createRenderPass();

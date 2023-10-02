@@ -38,15 +38,6 @@ namespace SharedUtils
     {
     public:
         explicit VulkanSwapChain() = delete;
-        // BOOST_DI_INJECT(VulkanSwapChain,
-        //                 std::shared_ptr<ILogicalDevice>,
-        //                 std::shared_ptr<IRenderingSurface>,
-        //                 (named = DESIRE_SWAPCHAIN_PRESENT_MODE) VkPresentModeKHR const &,
-        //                 (named = DESIRE_SWAPCHAIN_IMAGES_COUNT) const uint32_t,
-        //                 (named = DESIRE_SWAPCHAIN_IMAGES_USAGE) std::set<VkImageUsageFlagBits> const &,
-        //                 (named = DESIRE_SWAPCHAIN_IMAGES_TRANSFORMATION) VkSurfaceTransformFlagBitsKHR const &,
-        //                 (named = DESIRE_SWAPCHAIN_IMAGES_FORMAT) VkSurfaceFormatKHR const &,
-        //                 (named = DESIRE_SWAPCHAIN_IMAGES_LAYERS) const uint32_t);
         explicit VulkanSwapChain(
             std::shared_ptr<ILogicalDevice>,
             std::shared_ptr<IRenderingSurface>,
@@ -56,8 +47,7 @@ namespace SharedUtils
             VkSurfaceTransformFlagBitsKHR const &,
             VkSurfaceFormatKHR const &,
             const uint32_t,
-            VkSwapchainKHR old = VK_NULL_HANDLE
-        );
+            VkSwapchainKHR old = VK_NULL_HANDLE);
         // resize
         // ctor overload
         explicit VulkanSwapChain(ISwapChain &);
@@ -70,6 +60,12 @@ namespace SharedUtils
         };
 
         virtual ~VulkanSwapChain();
+
+        // image acquisition
+        // return the image index in the swap chain that you can write into
+        // semaphore: sync device queue
+        // fence: sync application (cpu/host)
+        VkResult acquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence = VK_NULL_HANDLE) const;
 
     private:
         VkSwapchainKHR _swapchain{VK_NULL_HANDLE};

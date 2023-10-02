@@ -37,6 +37,7 @@ namespace SharedUtils
 
     void VulkanContext::resize(const uint32_t width, const uint32_t height)
     {
+        cout << format("--> VulkanContext::resize") << std::endl;
         auto pDevice = std::any_cast<VkPhysicalDevice>(_device->getPhysicalDevice());
         auto vkSurface = std::any_cast<VkSurfaceKHR>(_surface->getSurface());
 
@@ -45,5 +46,6 @@ namespace SharedUtils
         // from wsi surface
         auto desiredImageExtent = surface_capabilities.currentExtent;
         _swapchain = std::make_unique<VulkanSwapChain>(*_swapchain);
+        cout << format("<-- VulkanContext::resize") << std::endl;
     }
 }

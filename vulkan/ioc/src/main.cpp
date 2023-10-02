@@ -23,6 +23,7 @@
 #include <glm/mat4x4.hpp>
 
 #include <iostream>
+#include <format>
 
 #include "shared/di.hpp"
 namespace di = boost::di;
@@ -30,15 +31,63 @@ namespace di = boost::di;
 using namespace SharedUtils;
 using namespace std;
 
-class IocApplication : public Application
+class VulkanApplication : public Application
 {
 public:
-    IocApplication(
+    VulkanApplication(
         std::unique_ptr<IContext> ctx,
         std::shared_ptr<IDeviceQueueList>) : Application(std::move(ctx))
     {
-        cout << "Ioc ctor" << std::endl;
+        cout << std::format("--> VulkanApplication::VulkanApplication") << std::endl;
+        VkSemaphoreCreateInfo semaphore_create_info{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+        auto vkDevice = any_cast<VkDevice>(this->_context->getLogicDevice()->getDevice());
+        VK_CHECK(vkCreateSemaphore(vkDevice, &semaphore_create_info, nullptr, &acquired_image_ready));
+        VK_CHECK(vkCreateSemaphore(vkDevice, &semaphore_create_info, nullptr, &render_complete));
+
+        cout<< std::format("--> VulkanApplication::VulkanApplication") << std::endl;
     };
+    void update() override
+    {
+        render();
+    }
+    virtual void render()
+    {
+        prepare_frame();
+    }
+
+protected:
+    void prepare_frame()
+    {
+        // // Acquire the next image from the swap chain
+        // auto vkSwapChain = dynamic_cast<VulkanSwapChain *>(this->_context->getSwapChain());
+        // VkResult result = vkSwapChain->acquireNextImage(current_image_index, acquired_image_ready, VK_NULL_HANDLE);
+        // // Recreate the swapchain if it's no longer compatible with the surface (OUT_OF_DATE)
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        // {
+        //     cout << "VK_ERROR_OUT_OF_DATE_KHR" << endl;
+        // }
+        // else if (result != VK_SUBOPTIMAL_KHR)
+        // {
+        //     VK_CHECK(result);
+        // }
+    }
+    virtual void draw(
+        // CommandBuffer &command_buffer, RenderTarget &render_target
+    )
+    {
+    }
+
+    // rendering process waits for swap chain image
+    VkSemaphore acquired_image_ready;
+
+    // swap chain present waits for render completes
+    VkSemaphore render_complete;
+
+    // Synchronization fences
+    std::vector<VkFence> wait_fences;
+
+    // Active image index in the swapchain
+    uint32_t current_image_index = 0;
 };
 
 int main()
@@ -51,7 +100,7 @@ int main()
     {
         return di::make_injector(
             di::bind<IWindow>().to<GlfwWindow>(),
-            di::bind<IApplication>().to<IocApplication>());
+            di::bind<IApplication>().to<VulkanApplication>());
     };
 
     std::initializer_list<std::string> validationLayers = {

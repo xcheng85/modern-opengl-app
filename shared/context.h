@@ -18,6 +18,8 @@ namespace SharedUtils
     public:
         virtual ~IContext() noexcept = default;
         virtual void resize(const uint32_t width, const uint32_t height) = 0;
+        virtual ISwapChain *getSwapChain() noexcept = 0;
+        virtual ILogicalDevice *getLogicDevice() noexcept = 0;
     };
 
     // life cycle of swapchain could be unique_ptr managed here
@@ -46,6 +48,14 @@ namespace SharedUtils
                         (named = DESIRE_SWAPCHAIN_IMAGES_LAYERS) const uint32_t);
         virtual ~VulkanContext();
         void resize(const uint32_t width, const uint32_t height) override;
+        inline ISwapChain *getSwapChain() noexcept override
+        {
+            return _swapchain.get();
+        };
+        inline ILogicalDevice *getLogicDevice() noexcept override
+        {
+            return _device.get();
+        };
 
     private:
         std::shared_ptr<ILogicalDevice> _device;

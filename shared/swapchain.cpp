@@ -21,7 +21,7 @@ namespace SharedUtils
         VkSurfaceTransformFlagBitsKHR const &desiredTransform,
         VkSurfaceFormatKHR const &desiredFormat,
         const uint32_t desiredImageLayers,
-         VkSwapchainKHR old)
+        VkSwapchainKHR old)
         : _device(device),
           _surface(surface),
           _presentMode(desiredPresentMode),
@@ -205,14 +205,15 @@ namespace SharedUtils
 
     VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)
         : VulkanSwapChain(current._device, current._surface, current._presentMode, current._imageCount,
-                          current._imageUsageBits, current._transform, current._surfaceFormat, current._imageLayers, 
+                          current._imageUsageBits, current._transform, current._surfaceFormat, current._imageLayers,
                           std::any_cast<VkSwapchainKHR>(current.getSwapChain()))
     {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
     }
 
-    VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other) noexcept{
+    VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &&other) noexcept
+    {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other)") << std::endl;
         _swapchain = other._swapchain;
         other._swapchain = VK_NULL_HANDLE;
@@ -226,5 +227,11 @@ namespace SharedUtils
             auto vkDevice = std::any_cast<VkDevice>(_device->getDevice());
             vkDestroySwapchainKHR(vkDevice, _swapchain, nullptr);
         }
+    }
+
+    VkResult VulkanSwapChain::acquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence) const
+    {
+        auto vkDevice = std::any_cast<VkDevice>(_device->getDevice());
+        return vkAcquireNextImageKHR(vkDevice, _swapchain, std::numeric_limits<uint64_t>::max(), image_acquired_semaphore, fence, &image_index);
     }
 }
