@@ -37,11 +37,20 @@ namespace SharedUtils
     {
     public:
         explicit VulkanLogicDeviceQueue() = delete;
-        explicit VulkanLogicDeviceQueue(const VkDevice&, uint32_t familyIndex, uint32_t queueIndex);
+        explicit VulkanLogicDeviceQueue(const VkDevice &, uint32_t familyIndex, uint32_t queueIndex);
         virtual ~VulkanLogicDeviceQueue();
+        inline auto &getVKQueue() noexcept
+        {
+            return _queue;
+        };
+        inline auto &getFamilyIndex() noexcept
+        {
+            return _familyIndex;
+        };
 
     private:
         VkQueue _queue;
+        uint32_t _familyIndex; // needed for command pool creation
     };
 
     class ILogicalDevice;

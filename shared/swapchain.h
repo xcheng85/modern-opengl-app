@@ -47,7 +47,7 @@ namespace SharedUtils
             VkSurfaceTransformFlagBitsKHR const &,
             VkSurfaceFormatKHR const &,
             const uint32_t,
-            VkSwapchainKHR old = VK_NULL_HANDLE);
+            VulkanSwapChain* old = nullptr);
         // resize
         // ctor overload
         explicit VulkanSwapChain(ISwapChain &);
@@ -66,6 +66,25 @@ namespace SharedUtils
         // semaphore: sync device queue
         // fence: sync application (cpu/host)
         VkResult acquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence = VK_NULL_HANDLE) const;
+        // get the images in the swapchain
+        inline const std::vector<VkImage> &getImages() const
+        {
+            return _images;
+        };
+        inline auto const &getSurfaceFormat() const
+        {
+            return _surfaceFormat;
+        };
+
+        inline auto const &getImageViews() const
+        {
+            return _image_views;
+        };
+
+        inline auto const &getImageExtents() const
+        {
+            return _imageExtent;
+        };
 
     private:
         VkSwapchainKHR _swapchain{VK_NULL_HANDLE};
@@ -78,5 +97,10 @@ namespace SharedUtils
         VkSurfaceTransformFlagBitsKHR _transform;
         VkSurfaceFormatKHR _surfaceFormat;
         uint32_t _imageLayers;
+        VkExtent2D _imageExtent;
+
+        std::vector<VkImage> _images;
+        // image is only accessible through imageView, last step
+        std::vector<VkImageView> _image_views;
     };
 }

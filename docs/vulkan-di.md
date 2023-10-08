@@ -29,6 +29,11 @@
 
     createSemaphore(): for acquire images to render in the swapchain
 
+    command pool, command, submit command to the device queue and then present
+    
+
+
+
     createImageViews();
 
     createRenderPass();

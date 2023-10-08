@@ -205,6 +205,15 @@ namespace SharedUtils
             break;
         }
         cout << format("<-- VulkanLogicalDevice::VulkanLogicalDevice") << endl;
+
+        for (auto const &f : _queueInfo)
+        {
+            // for (auto const &q : f.queueIndexes)
+            for (uint32_t queueIndex = 0U; queueIndex < f.queueIndexes.size(); ++queueIndex)
+            {
+                _vkDeviceQueues.push_back(make_unique<VulkanLogicDeviceQueue>(_device, f.familyIndex, queueIndex));
+            }
+        }
     }
 
     VulkanLogicalDevice::~VulkanLogicalDevice()
@@ -212,5 +221,15 @@ namespace SharedUtils
         // destroy logical device
         vkDestroyDevice(this->_device, nullptr);
         _device = VK_NULL_HANDLE;
+    }
+
+    std::vector<VulkanLogicDeviceQueue *> VulkanLogicalDevice::getDeviceQueues()
+    {
+        std::vector<VulkanLogicDeviceQueue *> queues(_vkDeviceQueues.size(), nullptr);
+        for (uint32_t queueIndex = 0U; queueIndex < _vkDeviceQueues.size(); ++queueIndex)
+        {
+            queues[queueIndex] = _vkDeviceQueues[queueIndex].get();
+        }
+        return queues;
     }
 }

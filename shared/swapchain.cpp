@@ -21,7 +21,7 @@ namespace SharedUtils
         VkSurfaceTransformFlagBitsKHR const &desiredTransform,
         VkSurfaceFormatKHR const &desiredFormat,
         const uint32_t desiredImageLayers,
-        VkSwapchainKHR old)
+        VulkanSwapChain *old)
         : _device(device),
           _surface(surface),
           _presentMode(desiredPresentMode),
@@ -51,6 +51,7 @@ namespace SharedUtils
         VkSurfaceCapabilitiesKHR surface_capabilities{};
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pDevice, vkSurface, &surface_capabilities);
         auto desiredImageExtent = surface_capabilities.currentExtent;
+        this->_imageExtent = desiredImageExtent;
 
         // format
         uint32_t surface_format_count{0U};
@@ -188,11 +189,47 @@ namespace SharedUtils
         // VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR,
         // VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR};
         create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        create_info.oldSwapchain = old;
+        if (!old)
+        {
+            create_info.oldSwapchain = VK_NULL_HANDLE;
+        }
+        else
+        {
+            auto old_swapchain = any_cast<VkSwapchainKHR>(old->getSwapChain());
+            create_info.oldSwapchain = old_swapchain;
+        }
         create_info.surface = vkSurface;
 
         auto vkDevice = std::any_cast<VkDevice>(device->getDevice());
         VK_CHECK(vkCreateSwapchainKHR(vkDevice, &create_info, nullptr, &_swapchain));
+
+        uint32_t numImagesInSwapChain{0u};
+        VK_CHECK(vkGetSwapchainImagesKHR(vkDevice, _swapchain, &numImagesInSwapChain, nullptr));
+        _images.resize(numImagesInSwapChain);
+        VK_CHECK(vkGetSwapchainImagesKHR(vkDevice, _swapchain, &numImagesInSwapChain, _images.data()));
+
+        // create image views
+        for (size_t i = 0; i < _images.size(); i++)
+        {
+            // Create an image view which we can render into.
+            VkImageViewCreateInfo view_info{VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
+            view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            view_info.format = format;
+            view_info.image = _images[i];
+            view_info.subresourceRange.levelCount = 1;
+            view_info.subresourceRange.layerCount = 1;
+            view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            view_info.components.r = VK_COMPONENT_SWIZZLE_R;
+            view_info.components.g = VK_COMPONENT_SWIZZLE_G;
+            view_info.components.b = VK_COMPONENT_SWIZZLE_B;
+            view_info.components.a = VK_COMPONENT_SWIZZLE_A;
+
+            VkImageView image_view;
+            VK_CHECK(vkCreateImageView(vkDevice, &view_info, nullptr, &image_view));
+
+            _image_views.push_back(image_view);
+        }
+
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain") << std::endl;
     }
 
@@ -206,7 +243,7 @@ namespace SharedUtils
     VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)
         : VulkanSwapChain(current._device, current._surface, current._presentMode, current._imageCount,
                           current._imageUsageBits, current._transform, current._surfaceFormat, current._imageLayers,
-                          std::any_cast<VkSwapchainKHR>(current.getSwapChain()))
+                          &current)
     {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &current)") << std::endl;
@@ -225,6 +262,11 @@ namespace SharedUtils
         if (_swapchain != VK_NULL_HANDLE)
         {
             auto vkDevice = std::any_cast<VkDevice>(_device->getDevice());
+            for (VkImageView image_view : _image_views)
+            {
+                vkDestroyImageView(vkDevice, image_view, nullptr);
+            }
+
             vkDestroySwapchainKHR(vkDevice, _swapchain, nullptr);
         }
     }

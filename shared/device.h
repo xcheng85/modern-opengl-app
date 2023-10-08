@@ -76,6 +76,7 @@ namespace SharedUtils
         virtual std::any getPhysicalDevice() = 0;
     };
 
+    class VulkanLogicDeviceQueue;
     struct QueueInfo;
     static auto DESIRE_PHYSICAL_DEVICE_EXTS = [] {};
     static auto DESIRE_PHYSICAL_DEVICE_FEATURES = [] {};
@@ -109,9 +110,12 @@ namespace SharedUtils
             return _pDevice;
         }
 
+        std::vector<VulkanLogicDeviceQueue*> getDeviceQueues();
+
     private:
         VkDevice _device;
         std::vector<QueueInfo> _queueInfo;
         VkPhysicalDevice _pDevice;
+        std::vector<std::unique_ptr<VulkanLogicDeviceQueue>> _vkDeviceQueues;
     };
 }

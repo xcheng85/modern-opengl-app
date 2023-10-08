@@ -12,6 +12,7 @@ using namespace std;
 namespace SharedUtils
 {
     VulkanLogicDeviceQueue::VulkanLogicDeviceQueue(const VkDevice &vkLogicDevice, uint32_t familyIndex, uint32_t queueIndex)
+    :_familyIndex(familyIndex)
     {
         // to do queueIndex fix bug
         cout << format("--> VulkanLogicDeviceQueue::VulkanLogicDeviceQueue") << std::endl;

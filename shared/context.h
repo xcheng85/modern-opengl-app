@@ -8,6 +8,15 @@
 #include "di.hpp"
 #include "utils.h"
 
+// context is for single window.
+// consider app which has multiple 3d window/canvas.
+
+// context wraps:
+// 1. swapchain
+// 2. surface
+// 3. device
+
+
 namespace SharedUtils
 {
     class ILogicalDevice;
