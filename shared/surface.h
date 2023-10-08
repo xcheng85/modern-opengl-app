@@ -30,6 +30,7 @@ namespace SharedUtils
         }
     private:
         VkSurfaceKHR _surface;
+        std::shared_ptr<IInstance> _instance;
     };
 
 }

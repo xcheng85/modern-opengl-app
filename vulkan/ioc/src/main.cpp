@@ -47,6 +47,11 @@ public:
         recordCommandBuffers();
         cout << std::format("--> VulkanApplication::VulkanApplication") << std::endl;
     };
+
+    virtual ~VulkanApplication()
+    {
+    }
+
     void update() override
     {
         render();
@@ -445,6 +450,46 @@ protected:
         }
     }
 
+    void destroySync()
+    {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkDestroySemaphore(vkDevice, this->acquired_image_ready, nullptr);
+        vkDestroySemaphore(vkDevice, this->render_complete, nullptr);
+    }
+
+    void destroyCommandBuffers()
+    {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkFreeCommandBuffers(vkDevice, cmd_pool, commandBuffers.size(), commandBuffers.data());
+        vkDestroyCommandPool(vkDevice, cmd_pool, nullptr);
+    }
+
+    void destroyRenderPass()
+    {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkDestroyRenderPass(vkDevice, render_pass, nullptr);
+    }
+
+    void destroyPipeline()
+    {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkDestroyPipeline(vkDevice, this->pipeline, nullptr);
+        vkDestroyPipelineLayout(vkDevice, this->pipelineLayout, nullptr);
+    }
+
+    void destroyFramebuffer()
+    {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkQueueWaitIdle(this->queue);
+
+        for (auto &framebuffer : this->swapchain_framebuffers)
+        {
+            vkDestroyFramebuffer(vkDevice, framebuffer, nullptr);
+        }
+
+        this->swapchain_framebuffers.clear();
+    }
+
     void recordCommandBuffers()
     {
         auto vkSwapChain = dynamic_cast<VulkanSwapChain *>(this->_context->getSwapChain());
@@ -517,6 +562,25 @@ protected:
             .pWaitDstStageMask = waitStages,
             .signalSemaphoreCount = 1,
             .pSignalSemaphores = &render_complete};
+    }
+
+    void cleanup()
+    {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkDeviceWaitIdle(vkDevice);
+
+        destroyFramebuffer();
+
+        destroyCommandBuffers();
+
+        destroySync();
+
+        destroyPipeline();
+
+        destroyRenderPass();
+
+        // swap chain resource is done through the virtual ctor of wrapper class
+        // device is clean in the wrapper class
     }
 
     // rendering process waits for swap chain image

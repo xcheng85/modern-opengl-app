@@ -12,7 +12,7 @@ namespace SharedUtils
 {
     VulkanRenderingSurface::VulkanRenderingSurface(
         std::shared_ptr<IWindow> window,
-        std::shared_ptr<IInstance> instance)
+        std::shared_ptr<IInstance> instance) : _instance(instance)
     {
         // detect window type based on rtti: typeid operator
         cout << format("--> VulkanRenderingSurface::VulkanRenderingSurface {}", typeid(*window).name()) << std::endl;
@@ -38,5 +38,7 @@ namespace SharedUtils
 
     VulkanRenderingSurface::~VulkanRenderingSurface()
     {
+        auto const &vkInstance = any_cast<VkInstance>(_instance->getInstance());
+        vkDestroySurfaceKHR(vkInstance, _surface, nullptr);
     }
 }

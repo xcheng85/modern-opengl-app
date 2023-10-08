@@ -138,5 +138,8 @@ namespace SharedUtils
         cout << format("<-- VulkanInstance::VulkanInstance") << std::endl;
     }
 
-
+    VulkanInstance::~VulkanInstance()
+    {
+        vkDestroyDebugReportCallbackEXT(_instance, _reportCallback, nullptr);
+    }
 }

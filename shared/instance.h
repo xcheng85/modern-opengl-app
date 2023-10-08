@@ -35,6 +35,7 @@ namespace SharedUtils
                         (named = VALIDATION_LAYERS) std::vector<std::string> const &,
                         (named = INSTANCE_EXTENSIONS) std::vector<std::string> const &,
                         IRenderingHostAppSettings &);
+        virtual ~VulkanInstance();
         inline const std::any getInstance() const override
         {
             return this->_instance;
