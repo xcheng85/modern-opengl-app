@@ -65,11 +65,19 @@ public:
 
     void resize(const uint32_t width, const uint32_t height) override
     {
+        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        vkDeviceWaitIdle(vkDevice);
+        destroyFramebuffer();
+        destroyCommandBuffers();
+        destroySync();
         // let context take resize handler first, swap chain will be recreated
         // old swap chain and image view is clearned by smart unique_ptr
         Application::resize(width, height);
 
+        this->initSync();
+        this->initCommandBuffers();
         this->initFramebuffer();
+        this->recordCommandBuffers();
     }
 
 protected:
