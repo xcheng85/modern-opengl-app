@@ -76,7 +76,7 @@ namespace SharedUtils
     {
         cout << format("--> VulkanPhysicalDeviceList::VulkanPhysicalDeviceList") << std::endl;
 
-        auto const &vkInstance = any_cast<VkInstance>(instance->getInstance());
+        auto const &vkInstance = instance->getVkHandle();
         uint32_t physical_device_count{0};
         VK_CHECK(vkEnumeratePhysicalDevices(vkInstance, &physical_device_count, nullptr));
 
@@ -150,7 +150,7 @@ namespace SharedUtils
 
             // selected the device successfully
             auto const &vkPDevices = std::static_pointer_cast<VulkanPhysicalDevice>(pDevice);
-            auto const &vkSurface = std::any_cast<VkSurfaceKHR>(rendSurface->getSurface());
+            auto const &vkSurface = rendSurface->getVkHandle();
             auto const &queueFamilies = vkPDevices->getQueueFamilyProperties();
 
             // ask for create multiple queues for one family within a device
@@ -201,7 +201,7 @@ namespace SharedUtils
             logicalDeviceCreateInfo.pEnabledFeatures = &features;
 
             this->_pDevice = std::any_cast<VkPhysicalDevice>(pDevice->getDevice());
-            VK_CHECK(vkCreateDevice(_pDevice, &logicalDeviceCreateInfo, nullptr, &_device));
+            VK_CHECK(vkCreateDevice(_pDevice, &logicalDeviceCreateInfo, nullptr, &_handle));
             break;
         }
         cout << format("<-- VulkanLogicalDevice::VulkanLogicalDevice") << endl;
@@ -211,7 +211,7 @@ namespace SharedUtils
             // for (auto const &q : f.queueIndexes)
             for (uint32_t queueIndex = 0U; queueIndex < f.queueIndexes.size(); ++queueIndex)
             {
-                _vkDeviceQueues.push_back(make_unique<VulkanLogicDeviceQueue>(_device, f.familyIndex, queueIndex));
+                _vkDeviceQueues.push_back(make_unique<VulkanLogicDeviceQueue>(_handle, f.familyIndex, queueIndex));
             }
         }
     }
@@ -219,8 +219,8 @@ namespace SharedUtils
     VulkanLogicalDevice::~VulkanLogicalDevice()
     {
         // destroy logical device
-        vkDestroyDevice(this->_device, nullptr);
-        _device = VK_NULL_HANDLE;
+        vkDestroyDevice(this->_handle, nullptr);
+        _handle = VK_NULL_HANDLE;
     }
 
     std::vector<VulkanLogicDeviceQueue *> VulkanLogicalDevice::getDeviceQueues()

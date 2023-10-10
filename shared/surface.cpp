@@ -25,8 +25,8 @@ namespace SharedUtils
             if (typeName.find("GLFWwindow") != typeName.npos)
             {
                 auto glfw = std::any_cast<GLFWwindow *>(handle);
-                auto const &vkInstance = any_cast<VkInstance>(instance->getInstance());
-                VkResult errCode = glfwCreateWindowSurface(vkInstance, glfw, NULL, &_surface);
+                auto const &vkInstance = instance->getVkHandle();
+                VkResult errCode = glfwCreateWindowSurface(vkInstance, glfw, NULL, &_handle);
                 if (errCode != VK_SUCCESS)
                 {
                     throw runtime_error("falied to create windows surface");
@@ -38,7 +38,7 @@ namespace SharedUtils
 
     VulkanRenderingSurface::~VulkanRenderingSurface()
     {
-        auto const &vkInstance = any_cast<VkInstance>(_instance->getInstance());
-        vkDestroySurfaceKHR(vkInstance, _surface, nullptr);
+        auto const &vkInstance = _instance->getVkHandle();
+        vkDestroySurfaceKHR(vkInstance, _handle, nullptr);
     }
 }

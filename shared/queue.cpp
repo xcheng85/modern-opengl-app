@@ -28,7 +28,7 @@ namespace SharedUtils
     VulkanLogicDeviceQueueList::VulkanLogicDeviceQueueList(std::shared_ptr<ILogicalDevice> logicDevice)
     {
         cout << format("--> VulkanLogicDeviceQueueList::VulkanLogicDeviceQueueList") << std::endl;
-        auto vkLogicDevice = any_cast<VkDevice>(logicDevice->getDevice());
+        auto vkLogicDevice = logicDevice->getVkHandle();
         auto queueInfo = any_cast<vector<QueueInfo>>(logicDevice->getQueueInfo());
 
         for (auto const &f : queueInfo)

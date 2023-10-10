@@ -101,9 +101,9 @@ namespace SharedUtils
                 .enabledExtensionCount = static_cast<uint32_t>(extensitions_names.size()),
                 .ppEnabledExtensionNames = extensitions_names.data()};
 
-        VK_CHECK(vkCreateInstance(&createInfo, nullptr, &_instance));
+        VK_CHECK(vkCreateInstance(&createInfo, nullptr, &_handle));
         // This function will load all required Vulkan entrypoints, including all extensions; you can use Vulkan from here on as usual.
-        volkLoadInstance(_instance);
+        volkLoadInstance(_handle);
         // add vulkan debugger layer
         {
             const VkDebugUtilsMessengerCreateInfoEXT ci = {
@@ -117,7 +117,7 @@ namespace SharedUtils
                     VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
                 .pfnUserCallback = &VulkanDebugCallback,
                 .pUserData = nullptr};
-            VK_CHECK(vkCreateDebugUtilsMessengerEXT(_instance, &ci, nullptr, &_messenger));
+            VK_CHECK(vkCreateDebugUtilsMessengerEXT(_handle, &ci, nullptr, &_messenger));
         }
         // enable the following will crash
         {
@@ -132,7 +132,7 @@ namespace SharedUtils
                     VK_DEBUG_REPORT_DEBUG_BIT_EXT,
                 .pfnCallback = &VulkanDebugReportCallback,
                 .pUserData = nullptr};
-            VK_CHECK(vkCreateDebugReportCallbackEXT(_instance, &ci, nullptr, &_reportCallback));
+            VK_CHECK(vkCreateDebugReportCallbackEXT(_handle, &ci, nullptr, &_reportCallback));
         }
 
         cout << format("<-- VulkanInstance::VulkanInstance") << std::endl;
@@ -140,6 +140,6 @@ namespace SharedUtils
 
     VulkanInstance::~VulkanInstance()
     {
-        vkDestroyDebugReportCallbackEXT(_instance, _reportCallback, nullptr);
+        vkDestroyDebugReportCallbackEXT(_handle, _reportCallback, nullptr);
     }
 }

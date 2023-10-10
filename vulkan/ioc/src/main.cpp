@@ -65,7 +65,7 @@ public:
 
     void resize(const uint32_t width, const uint32_t height) override
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkDeviceWaitIdle(vkDevice);
         destroyFramebuffer();
         destroyCommandBuffers();
@@ -102,7 +102,7 @@ protected:
     {
         if (this->queue != VK_NULL_HANDLE)
         {
-            auto vkSwapChain = any_cast<VkSwapchainKHR>(this->_context->getSwapChain()->getSwapChain());
+            auto vkSwapChain = this->_context->getSwapChain()->getVkHandle();
 
             // present current_image_index of swapchain images
             VkPresentInfoKHR present_info = {
@@ -166,7 +166,7 @@ protected:
 
         VkSemaphoreCreateInfo semaphore_create_info{.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
         this->device = dynamic_cast<VulkanLogicalDevice *>(_context->getLogicDevice());
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         auto vkSwapChain = dynamic_cast<VulkanSwapChain *>(this->_context->getSwapChain());
 
         VK_CHECK(vkCreateSemaphore(vkDevice, &semaphore_create_info, nullptr, &acquired_image_ready));
@@ -175,7 +175,7 @@ protected:
 
     void initRenderPass()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         auto vkSwapChain = dynamic_cast<VulkanSwapChain *>(this->_context->getSwapChain());
         // render pass
         // all the attachments in the render pass
@@ -252,7 +252,7 @@ protected:
         // 1. each swapchain image has command pool and create 1 command buffer (order random, needs fence in the host app)
         // 2. each swapchain image create different command buffer from the same command pool (order is respected)
         const auto &allPresentableQueues = device->getDeviceQueues();
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         auto vkSwapChain = dynamic_cast<VulkanSwapChain *>(this->_context->getSwapChain());
         if (allPresentableQueues.size() > 0)
         {
@@ -287,7 +287,7 @@ protected:
 
     void initPipeline()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         // shader module and pipeline
         // opengl: state machine
         // vulkan: all the shader variation means a different pipline obj
@@ -435,7 +435,7 @@ protected:
     // size of render area
     void initFramebuffer()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         auto vkSwapChain = dynamic_cast<VulkanSwapChain *>(this->_context->getSwapChain());
         const auto &extents = vkSwapChain->getImageExtents();
 
@@ -460,34 +460,34 @@ protected:
 
     void destroySync()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkDestroySemaphore(vkDevice, this->acquired_image_ready, nullptr);
         vkDestroySemaphore(vkDevice, this->render_complete, nullptr);
     }
 
     void destroyCommandBuffers()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkFreeCommandBuffers(vkDevice, cmd_pool, commandBuffers.size(), commandBuffers.data());
         vkDestroyCommandPool(vkDevice, cmd_pool, nullptr);
     }
 
     void destroyRenderPass()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkDestroyRenderPass(vkDevice, render_pass, nullptr);
     }
 
     void destroyPipeline()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkDestroyPipeline(vkDevice, this->pipeline, nullptr);
         vkDestroyPipelineLayout(vkDevice, this->pipelineLayout, nullptr);
     }
 
     void destroyFramebuffer()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkQueueWaitIdle(this->queue);
 
         for (auto &framebuffer : this->swapchain_framebuffers)
@@ -574,7 +574,7 @@ protected:
 
     void cleanup()
     {
-        auto vkDevice = any_cast<VkDevice>(device->getDevice());
+        auto vkDevice = device->getVkHandle();
         vkDeviceWaitIdle(vkDevice);
 
         destroyFramebuffer();

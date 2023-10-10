@@ -39,7 +39,7 @@ namespace SharedUtils
     {
         cout << format("--> VulkanContext::resize") << std::endl;
         auto pDevice = std::any_cast<VkPhysicalDevice>(_device->getPhysicalDevice());
-        auto vkSurface = std::any_cast<VkSurfaceKHR>(_surface->getSurface());
+        auto vkSurface = _surface->getVkHandle();
 
         VkSurfaceCapabilitiesKHR surface_capabilities{};
         VK_CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pDevice, vkSurface, &surface_capabilities))

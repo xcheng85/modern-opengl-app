@@ -7,14 +7,14 @@
 #include <volk.h>
 #include "di.hpp"
 #include "utils.h"
+#include "vulkan.h"
 
 namespace SharedUtils
 {
-    class IInstance
+    class IInstance: public VulkanObject<VkInstance, VK_OBJECT_TYPE_INSTANCE>
     {
     public:
         virtual ~IInstance() noexcept = default;
-        virtual const std::any getInstance() const = 0;
     };
 
     class IRenderingHostAppSettings
@@ -36,14 +36,8 @@ namespace SharedUtils
                         (named = INSTANCE_EXTENSIONS) std::vector<std::string> const &,
                         IRenderingHostAppSettings &);
         virtual ~VulkanInstance();
-        inline const std::any getInstance() const override
-        {
-            return this->_instance;
-        }
 
     private:
-        // dispatchable handle: pointer
-        VkInstance _instance;
         // debugger
         VkDebugUtilsMessengerEXT _messenger;
         VkDebugReportCallbackEXT _reportCallback;

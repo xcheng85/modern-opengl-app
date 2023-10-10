@@ -16,7 +16,6 @@
 // 2. surface
 // 3. device
 
-
 namespace SharedUtils
 {
     class ILogicalDevice;

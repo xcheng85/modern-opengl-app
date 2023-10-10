@@ -31,4 +31,43 @@ namespace SharedUtils
     VkShaderStageFlagBits glslangShaderStageToVulkan(glslang_stage_t sh);
 
     VkResult createGraphicsPipeline(VkDevice device);
+
+    template <typename VkHandle, VkObjectType OBJECT_TYPE>
+    class VulkanObject
+    {
+    public:
+        VulkanObject(VkHandle handle = VK_NULL_HANDLE) : _handle{handle}
+        {
+        }
+
+        VulkanObject(const VulkanObject &) = delete;
+        VulkanObject &operator=(const VulkanObject &) = delete;
+
+        VulkanObject(VulkanObject &&other) : _handle{other._handle}
+        {
+            other._handle = VK_NULL_HANDLE;
+        }
+
+        VulkanObject &operator=(VulkanObject &&other)
+        {
+            _handle = other._handle;
+            other._handle = VK_NULL_HANDLE;
+            return *this;
+        }
+
+        virtual ~VulkanObject() = default;
+
+        inline VkObjectType getObjectType() const
+        {
+            return OBJECT_TYPE;
+        }
+
+        inline const VkHandle &getVkHandle() const
+        {
+            return _handle;
+        }
+
+    protected:
+        VkHandle _handle;
+    };
 }

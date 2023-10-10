@@ -7,6 +7,7 @@
 #include <volk.h>
 #include "di.hpp"
 #include "utils.h"
+#include "vulkan.h"
 
 // physical device
 // surface from wsi
@@ -23,12 +24,12 @@
 
 namespace SharedUtils
 {
-    class ISwapChain
+    class ISwapChain : public VulkanObject<VkSwapchainKHR, VK_OBJECT_TYPE_SWAPCHAIN_KHR>
     {
     public:
         virtual ~ISwapChain() noexcept = default;
-        virtual std::any getSwapChain() = 0;
-        // explicit ISwapChain(ISwapChain &&) = delete;
+        // virtual std::any getSwapChain() = 0;
+        // // explicit ISwapChain(ISwapChain &&) = delete;
     };
 
     class ILogicalDevice;
@@ -54,10 +55,10 @@ namespace SharedUtils
         explicit VulkanSwapChain(VulkanSwapChain &);
         explicit VulkanSwapChain(VulkanSwapChain &&) noexcept;
 
-        inline std::any getSwapChain() override
-        {
-            return _swapchain;
-        };
+        // inline std::any getSwapChain() override
+        // {
+        //     return _swapchain;
+        // };
 
         virtual ~VulkanSwapChain();
 
@@ -87,7 +88,7 @@ namespace SharedUtils
         };
 
     private:
-        VkSwapchainKHR _swapchain{VK_NULL_HANDLE};
+        // VkSwapchainKHR _swapchain{VK_NULL_HANDLE};
         // for destroy swapchain and copy ctor
         std::shared_ptr<ILogicalDevice> _device;
         std::shared_ptr<IRenderingSurface> _surface;

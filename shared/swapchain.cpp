@@ -34,7 +34,7 @@ namespace SharedUtils
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain") << std::endl;
 
         auto pDevice = std::any_cast<VkPhysicalDevice>(device->getPhysicalDevice());
-        auto vkSurface = std::any_cast<VkSurfaceKHR>(surface->getSurface());
+        auto vkSurface = surface->getVkHandle();
 
         // present mode
         uint32_t present_mode_count{0U};
@@ -195,18 +195,18 @@ namespace SharedUtils
         }
         else
         {
-            auto old_swapchain = any_cast<VkSwapchainKHR>(old->getSwapChain());
+            auto old_swapchain = old->getVkHandle();
             create_info.oldSwapchain = old_swapchain;
         }
         create_info.surface = vkSurface;
 
-        auto vkDevice = std::any_cast<VkDevice>(device->getDevice());
-        VK_CHECK(vkCreateSwapchainKHR(vkDevice, &create_info, nullptr, &_swapchain));
+        auto vkDevice = device->getVkHandle();
+        VK_CHECK(vkCreateSwapchainKHR(vkDevice, &create_info, nullptr, &_handle));
 
         uint32_t numImagesInSwapChain{0u};
-        VK_CHECK(vkGetSwapchainImagesKHR(vkDevice, _swapchain, &numImagesInSwapChain, nullptr));
+        VK_CHECK(vkGetSwapchainImagesKHR(vkDevice, _handle, &numImagesInSwapChain, nullptr));
         _images.resize(numImagesInSwapChain);
-        VK_CHECK(vkGetSwapchainImagesKHR(vkDevice, _swapchain, &numImagesInSwapChain, _images.data()));
+        VK_CHECK(vkGetSwapchainImagesKHR(vkDevice, _handle, &numImagesInSwapChain, _images.data()));
 
         // create image views
         for (size_t i = 0; i < _images.size(); i++)
@@ -252,28 +252,28 @@ namespace SharedUtils
     VulkanSwapChain::VulkanSwapChain(VulkanSwapChain &&other) noexcept
     {
         cout << std::format("--> VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other)") << std::endl;
-        _swapchain = other._swapchain;
-        other._swapchain = VK_NULL_HANDLE;
+        _handle = other._handle;
+        other._handle = VK_NULL_HANDLE;
         cout << std::format("<-- VulkanSwapChain::VulkanSwapChain(VulkanSwapChain && other)") << std::endl;
     }
 
     VulkanSwapChain::~VulkanSwapChain()
     {
-        if (_swapchain != VK_NULL_HANDLE)
+        if (_handle != VK_NULL_HANDLE)
         {
-            auto vkDevice = std::any_cast<VkDevice>(_device->getDevice());
+            auto vkDevice = _device->getVkHandle();
             for (VkImageView image_view : _image_views)
             {
                 vkDestroyImageView(vkDevice, image_view, nullptr);
             }
 
-            vkDestroySwapchainKHR(vkDevice, _swapchain, nullptr);
+            vkDestroySwapchainKHR(vkDevice, _handle, nullptr);
         }
     }
 
     VkResult VulkanSwapChain::acquireNextImage(uint32_t &image_index, VkSemaphore image_acquired_semaphore, VkFence fence) const
     {
-        auto vkDevice = std::any_cast<VkDevice>(_device->getDevice());
-        return vkAcquireNextImageKHR(vkDevice, _swapchain, std::numeric_limits<uint64_t>::max(), image_acquired_semaphore, fence, &image_index);
+        auto vkDevice = _device->getVkHandle();
+        return vkAcquireNextImageKHR(vkDevice, _handle, std::numeric_limits<uint64_t>::max(), image_acquired_semaphore, fence, &image_index);
     }
 }
