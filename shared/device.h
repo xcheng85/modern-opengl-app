@@ -72,7 +72,6 @@ namespace SharedUtils
     {
     public:
         virtual ~ILogicalDevice() noexcept = default;
-        // virtual std::any getDevice() = 0;
         virtual std::any getQueueInfo() = 0;
         virtual std::any getPhysicalDevice() = 0;
     };
@@ -95,13 +94,7 @@ namespace SharedUtils
                         (named = DESIRE_QUEUE_FAMILY_CAPABILITY) VkQueueFlagBits,
                         std::shared_ptr<IRenderingSurface>);
 
-        // explicit VulkanLogicalDevice(std::shared_ptr<IPhysicalDevice>, std::shared_ptr<IRenderingSurface>);
         virtual ~VulkanLogicalDevice();
-
-        // inline std::any getDevice() override
-        // {
-        //     return _device;
-        // }
 
         inline any getQueueInfo() override {
             return _queueInfo;
@@ -114,7 +107,6 @@ namespace SharedUtils
         std::vector<VulkanLogicDeviceQueue*> getDeviceQueues();
 
     private:
-        // VkDevice _device;
         std::vector<QueueInfo> _queueInfo;
         VkPhysicalDevice _pDevice;
         std::vector<std::unique_ptr<VulkanLogicDeviceQueue>> _vkDeviceQueues;

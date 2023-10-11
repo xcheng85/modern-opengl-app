@@ -68,7 +68,12 @@ namespace SharedUtils
     private:
         std::shared_ptr<ILogicalDevice> _device;
         std::shared_ptr<IRenderingSurface> _surface;
+
+        // owner of swapchain
         std::unique_ptr<ISwapChain> _swapchain;
+
+        // owner of current swap chain image index
+        uint32_t activeSwapChainImageIndex{0};
     };
 
 }
