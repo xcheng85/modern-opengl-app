@@ -11,7 +11,7 @@ namespace SharedUtils
 {
     using namespace std;
 
-    #define VK_CHECK(value) SharedUtils::CHECK(value == VK_SUCCESS, __FILE__, __LINE__);
+#define VK_CHECK(value) SharedUtils::CHECK(value == VK_SUCCESS, __FILE__, __LINE__);
 
     // forward declaration to avoid multiple definition.
     void CHECK(bool check, const char *fileName, int lineNumber);
@@ -43,4 +43,22 @@ namespace SharedUtils
     {
         void convert(std::vector<string> const &in, std::vector<const char *> &out);
     }
+}
+
+namespace VulkanUtils
+{
+
+    bool isDepthFormat(VkFormat format)
+    {
+        return format == VK_FORMAT_D16_UNORM ||
+               format == VK_FORMAT_D32_SFLOAT;
+    }
+
+    bool isDepthStencilFormat(VkFormat format)
+    {
+        return format == VK_FORMAT_D16_UNORM_S8_UINT ||
+               format == VK_FORMAT_D24_UNORM_S8_UINT ||
+               format == VK_FORMAT_D32_SFLOAT_S8_UINT;
+    }
+
 }
