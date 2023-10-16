@@ -68,6 +68,14 @@ namespace SharedUtils
         virtual ~VulkanPhysicalDeviceList();
     };
 
+    // resource cache for the logic device
+    // 1. pipeline_cache and pipeline_layouts
+    // 2. descriptor set and descriptor_pools, descriptor set layout
+    // 3. framebuffers
+    // 4. render_passes
+    // 5. graphics and compute pipeline
+    
+
     class ILogicalDevice : public VulkanObject<VkDevice, VK_OBJECT_TYPE_DEVICE>
     {
     public:

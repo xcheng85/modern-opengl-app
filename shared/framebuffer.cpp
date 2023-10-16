@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "framebuffer.h"
 #include "device.h"
+#include "queue.h"
 
 using namespace std;
 namespace SharedUtils

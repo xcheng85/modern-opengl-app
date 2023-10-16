@@ -5,9 +5,9 @@
 
 #include "renderpass.h"
 #include "device.h"
+#include "queue.h"
 
 using namespace std;
-using namespace VulkanUtils;
 namespace rg = std::ranges;
 namespace SharedUtils
 {

@@ -70,4 +70,17 @@ namespace SharedUtils
     protected:
         VkHandle _handle;
     };
+    
+    inline bool isDepthFormat(VkFormat format)
+    {
+        return format == VK_FORMAT_D16_UNORM ||
+               format == VK_FORMAT_D32_SFLOAT;
+    }
+
+    inline bool isDepthStencilFormat(VkFormat format)
+    {
+        return format == VK_FORMAT_D16_UNORM_S8_UINT ||
+               format == VK_FORMAT_D24_UNORM_S8_UINT ||
+               format == VK_FORMAT_D32_SFLOAT_S8_UINT;
+    }
 }

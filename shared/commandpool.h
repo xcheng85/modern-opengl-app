@@ -46,6 +46,6 @@ namespace SharedUtils
 
         uint32_t _queueFamilyIndex;
 
-        std::vector<std::unique_ptr<ICommandBuffer>> _commandBuffers;
+     //   std::vector<std::unique_ptr<ICommandBuffer>> _commandBuffers;
     };
 }

@@ -44,21 +44,3 @@ namespace SharedUtils
         void convert(std::vector<string> const &in, std::vector<const char *> &out);
     }
 }
-
-namespace VulkanUtils
-{
-
-    bool isDepthFormat(VkFormat format)
-    {
-        return format == VK_FORMAT_D16_UNORM ||
-               format == VK_FORMAT_D32_SFLOAT;
-    }
-
-    bool isDepthStencilFormat(VkFormat format)
-    {
-        return format == VK_FORMAT_D16_UNORM_S8_UINT ||
-               format == VK_FORMAT_D24_UNORM_S8_UINT ||
-               format == VK_FORMAT_D32_SFLOAT_S8_UINT;
-    }
-
-}
